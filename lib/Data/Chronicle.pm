@@ -82,16 +82,16 @@ Given a category, name and timestamp returns version of data under "category::na
 
 =cut
 
-#we cache connection to Postgres, so we use state feature.
-use feature "state";
-
 #used for loading chronicle config file which contains connection information
-use YAML::XS;
 use JSON;
-use DBI;
 use DateTime;
 use Date::Utility;
+use Moose;
 
+has [qw(cache_writer cache_reader db_handle)] => (
+    is      => 'ro',
+    default => undef,
+);
 
 =head3 C<< set("category1", "name1", $value1)  >>
 
@@ -100,6 +100,7 @@ Store a piece of data "value1" under key "category1::name1" in Pg and Redis.
 =cut
 
 sub set {
+    my $self     = shift;
     my $category = shift;
     my $name     = shift;
     my $value    = shift;
@@ -113,8 +114,8 @@ sub set {
     $value = JSON::to_json($value);
 
     my $key = $category . '::' . $name;
-    BOM::System::RedisReplicated::redis_write()->set($key, $value);
-    _archive($category, $name, $value, $rec_date) if _dbh();
+    $self->cache_writer->set($key, $value);
+    $self->_archive($category, $name, $value, $rec_date) if $self->db_handle;
 
     return 1;
 }
@@ -126,11 +127,12 @@ Query for the latest data under "category1::name1" from Redis.
 =cut
 
 sub get {
+    my $self     = shift;
     my $category = shift;
     my $name     = shift;
 
     my $key         = $category . '::' . $name;
-    my $cached_data = BOM::System::RedisReplicated::redis_read()->get($key);
+    my $cached_data = $self->cache_reader->get($key);
 
     return JSON::from_json($cached_data) if defined $cached_data;
     return;
@@ -143,13 +145,14 @@ Query Pg archive for the data under "category1::name1" at or exactly before the 
 =cut
 
 sub get_for {
+    my $self     = shift;
     my $category = shift;
     my $name     = shift;
     my $date_for = shift;    #epoch or Date::Utility
 
     my $db_timestamp = Date::Utility->new($date_for)->db_timestamp;
 
-    my $db_data = _dbh()->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
+    my $db_data = $self->db_handle->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
         'id', {}, $category, $name, $db_timestamp);
 
     return if not %$db_data;
@@ -161,6 +164,7 @@ sub get_for {
 }
 
 sub get_for_period {
+    my $self     = shift;
     my $category = shift;
     my $name     = shift;
     my $start    = shift;    #epoch or Date::Utility
@@ -170,7 +174,7 @@ sub get_for_period {
     my $end_timestamp   = Date::Utility->new($end)->db_timestamp;
 
     my $db_data =
-        _dbh()->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? AND timestamp >=? order by timestamp desc},
+        $self->db_handle->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? AND timestamp >=? order by timestamp desc},
         'id', {}, $category, $name, $end_timestamp, $start_timestamp);
 
     return if not %$db_data;
@@ -187,6 +191,7 @@ sub get_for_period {
 }
 
 sub _archive {
+    my $self     = shift;
     my $category = shift;
     my $name     = shift;
     my $value    = shift;
@@ -195,7 +200,7 @@ sub _archive {
     # In unit tests, we will use Test::MockTime to force Chronicle to store hostorical data
     my $db_timestamp = $rec_date->db_timestamp;
 
-    return _dbh()->prepare(<<'SQL')->execute($category, $name, $value, $db_timestamp);
+    return $self->db_handle->prepare(<<'SQL')->execute($category, $name, $value, $db_timestamp);
 WITH ups AS (
     UPDATE chronicle
        SET value=$3
@@ -210,42 +215,9 @@ SELECT $4, $1, $2, $3
 SQL
 }
 
-#According to discussions made, we are supposed to support "Redis only" installation where there is not Pg.
-#The assumption is that we have Redis for all data which is important for continutation of our services
-#We also have Pg for an archive of data used later for non-live services (e.g back-testing, auditing, ...)
-#And in case for any reason, Redis has problems, we will need to re-populate its information not from Pg
-#But by re-running population scripts
-sub _dbh {
-    #silently ignore if there is not configuration for Pg chronicle (e.g. in Travis)
-    return if not defined _config()->{chronicle};
+no Moose;
 
-    state $dbh = DBI->connect_cached(
-        "dbi:Pg:dbname=chronicle;port=6432;host=/var/run/postgresql",
-        "write", '',
-        {
-            RaiseError => 1,
-        });
-    return $dbh;
-}
-
-sub flush {
-}
-
-sub _config {
-    state $config = YAML::XS::LoadFile('/etc/rmg/chronicle.yml');
-    return $config;
-}
-
-# this code should be deleted after some time
-sub _redis_read {
-    warn "Chronicle::_redis_read is deprecated. Please, use RedisReplicated::redis_read";
-    return BOM::System::RedisReplicated::redis_read;
-}
-
-sub _redis_write {
-    warn "Chronicle::_redis_write is deprecated. Please, use RedisReplicated::redis_write";
-    return BOM::System::RedisReplicated::redis_write;
-}
+__PACKAGE__->meta->make_immutable;
 
 =head1 AUTHOR
 
@@ -332,7 +304,6 @@ YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
 CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 
 =cut
 
