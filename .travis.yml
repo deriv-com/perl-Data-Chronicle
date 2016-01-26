@@ -1,0 +1,15 @@
+language: perl
+perl:
+    - "5.20"
+    - "5.18"
+    - "5.16"
+    - "5.14"
+before_install:
+    - "cpanm --installdeps ."
+    - "cpanm Date::Utility" 
+    - "cpanm Test::Mock::Redis"
+    - "cpanm DBD::Mock"
+    - "cpanm Moose"
+    - "cpanm JSON"
+script:
+  perl Makefile.PL && make test

@@ -84,7 +84,6 @@ Given a category, name and timestamp returns version of data under "category::na
 
 #used for loading chronicle config file which contains connection information
 use JSON;
-use DateTime;
 use Date::Utility;
 use Moose;
 
