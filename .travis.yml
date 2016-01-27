@@ -8,7 +8,8 @@ before_install:
     - "cpanm --installdeps ."
     - "cpanm Date::Utility" 
     - "cpanm Test::Mock::Redis"
-    - "cpanm DBD::Mock"
+    - "cpanm Test::postgresql"
+    - "cpanm DBI"
     - "cpanm Moose"
     - "cpanm JSON"
 script:

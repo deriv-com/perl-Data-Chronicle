@@ -1,6 +1,6 @@
 package Data::Chronicle;
 
-use 5.006;
+use 5.014;
 use strict;
 use warnings;
 
@@ -87,7 +87,7 @@ use JSON;
 use Date::Utility;
 use Moose;
 
-has [qw(cache_writer cache_reader db_handle)] => (
+has [qw(cache_writer cache_reader db_handle dummy)] => (
     is      => 'ro',
     default => undef,
 );
@@ -215,8 +215,6 @@ SQL
 }
 
 no Moose;
-
-__PACKAGE__->meta->make_immutable;
 
 =head1 AUTHOR
 
