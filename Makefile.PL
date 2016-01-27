@@ -6,8 +6,8 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME             => 'Data::Chronicle',
     AUTHOR           => q{Binary.com <support@binary.com>},
-    VERSION_FROM     => 'lib/Data/Chronicle.pm',
-    ABSTRACT_FROM    => 'lib/Data/Chronicle.pm',
+    VERSION_FROM     => 'lib/Data/Chronicle/Writer.pm',
+    ABSTRACT_FROM    => 'lib/Data/Chronicle/Writer.pm',
     LICENSE          => 'artistic_2',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.014,

@@ -2,6 +2,9 @@
 Changes
 ignore.txt
 lib/Data/Chronicle.pm
+lib/Data/Chronicle/Mock.pm
+lib/Data/Chronicle/Reader.pm
+lib/Data/Chronicle/Writer.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
