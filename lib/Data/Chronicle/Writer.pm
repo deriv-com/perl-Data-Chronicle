@@ -1,4 +1,4 @@
-package Data::Chronicle;
+package Data::Chronicle::Writer;
 
 use 5.014;
 use strict;
@@ -75,7 +75,7 @@ Given a category, name and timestamp returns version of data under "category::na
  BOM::System::Chronicle::set("vol_surface", "frxUSDJPY", $d);
 
  #retrieve latest data stored for "vol_surface" and "frxUSDJPY"
- my $dt = BOM::System::Chronicle::set("vol_surface", "frxUSDJPY");
+ my $dt = BOM::System::Chronicle::get("vol_surface", "frxUSDJPY");
 
  #find vol_surface for frxUSDJPY as of a specific date
  my $some_old_data = get_for("vol_surface", "frxUSDJPY", $epoch1);
@@ -87,7 +87,7 @@ use JSON;
 use Date::Utility;
 use Moose;
 
-has [qw(cache_writer cache_reader db_handle dummy)] => (
+has [qw(cache_writer db_handle)] => (
     is      => 'ro',
     default => undef,
 );
@@ -117,76 +117,6 @@ sub set {
     $self->_archive($category, $name, $value, $rec_date) if $self->db_handle;
 
     return 1;
-}
-
-=head3 C<< my $data = get("category1", "name1") >>
-
-Query for the latest data under "category1::name1" from Redis.
-
-=cut
-
-sub get {
-    my $self     = shift;
-    my $category = shift;
-    my $name     = shift;
-
-    my $key         = $category . '::' . $name;
-    my $cached_data = $self->cache_reader->get($key);
-
-    return JSON::from_json($cached_data) if defined $cached_data;
-    return;
-}
-
-=head3 C<< my $data = get_for("category1", "name1", 1447401505) >>
-
-Query Pg archive for the data under "category1::name1" at or exactly before the given epoch/Date::Utility.
-
-=cut
-
-sub get_for {
-    my $self     = shift;
-    my $category = shift;
-    my $name     = shift;
-    my $date_for = shift;    #epoch or Date::Utility
-
-    my $db_timestamp = Date::Utility->new($date_for)->db_timestamp;
-
-    my $db_data = $self->db_handle->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
-        'id', {}, $category, $name, $db_timestamp);
-
-    return if not %$db_data;
-
-    my $id_value = (sort keys %{$db_data})[0];
-    my $db_value = $db_data->{$id_value}->{value};
-
-    return JSON::from_json($db_value);
-}
-
-sub get_for_period {
-    my $self     = shift;
-    my $category = shift;
-    my $name     = shift;
-    my $start    = shift;    #epoch or Date::Utility
-    my $end      = shift;    #epoch or Date::Utility
-
-    my $start_timestamp = Date::Utility->new($start)->db_timestamp;
-    my $end_timestamp   = Date::Utility->new($end)->db_timestamp;
-
-    my $db_data =
-        $self->db_handle->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? AND timestamp >=? order by timestamp desc},
-        'id', {}, $category, $name, $end_timestamp, $start_timestamp);
-
-    return if not %$db_data;
-
-    my @result;
-
-    for my $id_value (keys %$db_data) {
-        my $db_value = $db_data->{$id_value}->{value};
-
-        push @result, JSON::from_json($db_value);
-    }
-
-    return \@result;
 }
 
 sub _archive {
