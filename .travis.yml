@@ -1,4 +1,8 @@
 language: perl
+addons:
+    postgresql: "9.4"
+services:
+    - postgresql
 perl:
     - "5.20"
     - "5.18"
