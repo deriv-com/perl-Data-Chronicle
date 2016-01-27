@@ -5,7 +5,6 @@ perl:
     - "5.16"
     - "5.14"
 before_install:
-    - "cpanm --installdeps ."
     - "cpanm Date::Utility" 
     - "cpanm Test::Mock::Redis"
     - "cpanm Test::postgresql"
