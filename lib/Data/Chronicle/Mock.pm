@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use DBI;
-use Test::postgresql;
+use Test::PostgreSQL;
 use Test::Mock::Redis;
 use Data::Chronicle::Reader;
 use Data::Chronicle::Writer;
@@ -13,7 +13,7 @@ use Data::Chronicle::Writer;
 sub get_mocked_chronicle {
     my $redis = Test::Mock::Redis->new(server => 'whatever');
 
-    my $pgsql = Test::postgresql->new();
+    my $pgsql = Test::PostgreSQL->new();
     my $dbh = DBI->connect($pgsql->dsn);
 
     my $stmt = qq(CREATE TABLE chronicle (

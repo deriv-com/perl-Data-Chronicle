@@ -11,7 +11,7 @@ perl:
 before_install:
     - "cpanm Date::Utility" 
     - "cpanm Test::Mock::Redis"
-    - "cpanm Test::postgresql"
+    - "cpanm Test::PostgreSQL"
     - "cpanm DBI"
     - "cpanm Moose"
     - "cpanm JSON"
