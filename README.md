@@ -2,7 +2,7 @@
 
 This repository contains two modules (Reader and Writer) which can be used to store and retrieve information
 on an efficient storage with below properties:
-
+ 
 * **Timeliness**
 It is assumed that data to be stored are time-based meaning they change over time and the latest version is most important for us.
 Many data structures in our system fall into this category (For example Volatility Surfaces, Interest Rate information, ...).
