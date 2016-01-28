@@ -128,7 +128,8 @@ sub get_for {
 
     my $db_timestamp = Date::Utility->new($date_for)->db_timestamp;
 
-    my $db_data = $self->db_handle->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
+    my $db_data =
+        $self->db_handle->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
         'id', {}, $category, $name, $db_timestamp);
 
     return if not %$db_data;
@@ -150,7 +151,8 @@ sub get_for_period {
     my $end_timestamp   = Date::Utility->new($end)->db_timestamp;
 
     my $db_data =
-        $self->db_handle->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? AND timestamp >=? order by timestamp desc},
+        $self->db_handle->selectall_hashref(
+        q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? AND timestamp >=? order by timestamp desc},
         'id', {}, $category, $name, $end_timestamp, $start_timestamp);
 
     return if not %$db_data;
