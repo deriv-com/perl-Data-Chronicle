@@ -6,7 +6,7 @@ use warnings;
 
 =head1 NAME
 
-Data::Chronicle - Provides efficient data storage for volatile and time-based data
+Data::Chronicle::Writer - Provides writing to an efficient data storage for volatile and time-based data
 
 =head1 VERSION
 
@@ -146,7 +146,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Data::Chronicle
+    perldoc Data::Chronicle::Writer
 
 
 You can also look for information at:
