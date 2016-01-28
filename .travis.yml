@@ -1,0 +1,21 @@
+language: perl
+addons:
+    postgresql: "9.4"
+services:
+    - postgresql
+env:
+    - RELEASE_TESTING
+perl:
+    - "5.20"
+    - "5.18"
+    - "5.16"
+    - "5.14"
+before_install:
+    - "cpanm Date::Utility" 
+    - "cpanm Test::Mock::Redis"
+    - "cpanm Test::PostgreSQL"
+    - "cpanm DBI"
+    - "cpanm Moose"
+    - "cpanm JSON"
+script:
+  perl Makefile.PL && make test
