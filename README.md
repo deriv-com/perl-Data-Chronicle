@@ -5,7 +5,6 @@ on an efficient storage with below properties:
  
 * **Timeliness**
 It is assumed that data to be stored are time-based meaning they change over time and the latest version is most important for us.
-Many data structures in our system fall into this category (For example Volatility Surfaces, Interest Rate information, ...).
 
 * **Efficient**:
 The module uses Redis cache to provide efficient data storage and retrieval.
@@ -38,7 +37,7 @@ Given a category, name, start_timestamp and end_timestamp returns an array-ref c
 ## Examples ##
 
 ```
-my $d = get_some_data();
+my $d = get_some_log_data();
 
 my $chronicle_w = Data::Chronicle::Writer->new( 
     cache_writer => $writer,
@@ -50,12 +49,12 @@ my $chronicle_r = Data::Chronicle::Reader->new(
 
 
 #store data into Chronicle
-$chronicle_w->set("vol_surface", "frxUSDJPY", $d);
+$chronicle_w->set("log_files", "syslog", $d);
 
-#retrieve latest data stored for "vol_surface" and "frxUSDJPY"
-my $dt = $chronicle_r->get("vol_surface", "frxUSDJPY");
+#retrieve latest data stored for syslog under log_files category
+my $dt = $chronicle_r->get("log_files", "syslog");
 
-#find vol_surface for frxUSDJPY as of a specific date
-my $some_old_data = $chronicle_r->get_for("vol_surface", "frxUSDJPY", $epoch1);
+#find historical data for `syslog` at given point in time
+my $some_old_data = $chronicle_r->get_for("log_files", "syslog", $epoch1);
 
 ```
