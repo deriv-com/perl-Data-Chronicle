@@ -4,6 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
+c
 =head1 NAME
 
 Data::Chronicle - Provides efficient data storage for volatile and time-based data
