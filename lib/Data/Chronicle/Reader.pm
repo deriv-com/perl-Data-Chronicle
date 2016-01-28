@@ -26,7 +26,6 @@ on an efficient storage with below properties:
 =item B<Timeliness>
 
 It is assumed that data to be stored are time-based meaning they change over time and the latest version is most important for us.
-Many data structures in our system fall into this category (For example Volatility Surfaces, Interest Rate information, ...).
 
 =item B<Efficient>
 
@@ -35,10 +34,6 @@ The module uses Redis cache to provide efficient data storage and retrieval.
 =item B<Persistent>
 
 In addition to caching every incoming data, it is also stored in PostgresSQL for future retrieval.
-
-=item B<Distributed>
-
-These data are stored in distributed storage so they will be replicated to other servers instantly.
 
 =item B<Transparent>
 
@@ -69,20 +64,29 @@ Given a category, name and timestamp returns version of data under "category::na
 
 =head1 Example
 
- my $d = get_some_data();
+ my $d = get_some_log_data();
 
- #store data into Chronicle
- BOM::System::Chronicle::set("vol_surface", "frxUSDJPY", $d);
+ my $chronicle_w = Data::Chronicle::Writer->new( 
+    cache_writer => $writer,
+    db_handle    => $dbh);
 
- #retrieve latest data stored for "vol_surface" and "frxUSDJPY"
- my $dt = BOM::System::Chronicle::get("vol_surface", "frxUSDJPY");
+ my $chronicle_r = Data::Chronicle::Reader->new( 
+    cache_reader => $reader, 
+    db_handle    => $dbh);
 
- #find vol_surface for frxUSDJPY as of a specific date
- my $some_old_data = get_for("vol_surface", "frxUSDJPY", $epoch1);
+
+ #store data into Chronicle - each time we call `set` it will also store 
+ #a copy of the data for historical data retrieval
+ $chronicle_w->set("log_files", "syslog", $d);
+
+ #retrieve latest data stored for syslog under log_files category
+ my $dt = $chronicle_r->get("log_files", "syslog");
+
+ #find historical data for `syslog` at given point in time
+ my $some_old_data = $chronicle_r->get_for("log_files", "syslog", $epoch1);
 
 =cut
 
-#used for loading chronicle config file which contains connection information
 use JSON;
 use Date::Utility;
 use Moose;
@@ -252,4 +256,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Data::Chronicle
+1;

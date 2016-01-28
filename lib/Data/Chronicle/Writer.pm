@@ -26,7 +26,6 @@ on an efficient storage with below properties:
 =item B<Timeliness>
 
 It is assumed that data to be stored are time-based meaning they change over time and the latest version is most important for us.
-Many data structures in our system fall into this category (For example Volatility Surfaces, Interest Rate information, ...).
 
 =item B<Efficient>
 
@@ -36,10 +35,6 @@ The module uses Redis cache to provide efficient data storage and retrieval.
 
 In addition to caching every incoming data, it is also stored in PostgresSQL for future retrieval.
 
-=item B<Distributed>
-
-These data are stored in distributed storage so they will be replicated to other servers instantly.
-
 =item B<Transparent>
 
 This modules hides all the details about distribution, caching, database structure and ... from developer. He only needs to call a method
@@ -47,42 +42,31 @@ to save data and another method to retrieve it. All the underlying complexities 
 
 =back
 
-There are three important methods this module provides:
-
-=over 4
-
-=item C<set>
-
-Given a category, name and value stores the JSONified value in Redis and PostgreSQL database under "category::name" group and also stores current
-system time as the timestamp for the data (Which can be used for future retrieval if we want to get data as of a specific time). Note that the value
-MUST be either hash-ref or array-ref.
-
-=item C<get>
-
-Given a category and name returns the latest version of the data according to current Redis cache
-
-=item C<get_for>
-
-Given a category, name and timestamp returns version of data under "category::name" as of the given date (using a DB lookup).
-
-=back
-
 =head1 Example
 
- my $d = get_some_data();
+ my $d = get_some_log_data();
 
- #store data into Chronicle
- BOM::System::Chronicle::set("vol_surface", "frxUSDJPY", $d);
+ my $chronicle_w = Data::Chronicle::Writer->new( 
+    cache_writer => $writer,
+    db_handle    => $dbh);
 
- #retrieve latest data stored for "vol_surface" and "frxUSDJPY"
- my $dt = BOM::System::Chronicle::get("vol_surface", "frxUSDJPY");
+ my $chronicle_r = Data::Chronicle::Reader->new( 
+    cache_reader => $reader, 
+    db_handle    => $dbh);
 
- #find vol_surface for frxUSDJPY as of a specific date
- my $some_old_data = get_for("vol_surface", "frxUSDJPY", $epoch1);
+
+ #store data into Chronicle - each time we call `set` it will also store 
+ #a copy of the data for historical data retrieval
+ $chronicle_w->set("log_files", "syslog", $d);
+
+ #retrieve latest data stored for syslog under log_files category
+ my $dt = $chronicle_r->get("log_files", "syslog");
+
+ #find historical data for `syslog` at given point in time
+ my $some_old_data = $chronicle_r->get_for("log_files", "syslog", $epoch1);
 
 =cut
 
-#used for loading chronicle config file which contains connection information
 use JSON;
 use Date::Utility;
 use Moose;
@@ -126,7 +110,6 @@ sub _archive {
     my $value    = shift;
     my $rec_date = shift;
 
-    # In unit tests, we will use Test::MockTime to force Chronicle to store hostorical data
     my $db_timestamp = $rec_date->db_timestamp;
 
     return $self->db_handle->prepare(<<'SQL')->execute($category, $name, $value, $db_timestamp);
@@ -234,4 +217,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Data::Chronicle
+1;
