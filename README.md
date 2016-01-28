@@ -48,7 +48,8 @@ my $chronicle_r = Data::Chronicle::Reader->new(
     db_handle    => $dbh);
 
 
-#store data into Chronicle
+#store data into Chronicle - each time we call `set` it will also store 
+#a copy of the data for historical data retrieval
 $chronicle_w->set("log_files", "syslog", $d);
 
 #retrieve latest data stored for syslog under log_files category
