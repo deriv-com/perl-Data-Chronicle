@@ -18,23 +18,23 @@ my $first_save_epoch = time;
 
 my ($chronicle_r, $chronicle_w) = Data::Chronicle::Mock::get_mocked_chronicle();
 
-is $chronicle_w->set("vol_surface", "frxUSDJPY", $d), 1, "data is stored without problem";
-is_deeply $chronicle_r->get("vol_surface", "frxUSDJPY"), $d, "data retrieval works";
-is_deeply $chronicle_r->cache_reader->get("vol_surface::frxUSDJPY"), JSON::to_json($d), "redis has stored correct data";
+is $chronicle_w->set("log", "syslog", $d), 1, "data is stored without problem";
+is_deeply $chronicle_r->get("log", "syslog"), $d, "data retrieval works";
+is_deeply $chronicle_r->cache_reader->get("log::syslog"), JSON::to_json($d), "redis has stored correct data";
 
-is $chronicle_w->set("vol_surface", "frxUSDJPY-old", $d_old, Date::Utility->new(0)), 1, "data is stored without problem when specifying recorded date";
+is $chronicle_w->set("log", "syslog-old", $d_old, Date::Utility->new(0)), 1, "data is stored without problem when specifying recorded date";
 
-my $old_data = $chronicle_r->get_for("vol_surface", "frxUSDJPY-old", 0);
+my $old_data = $chronicle_r->get_for("log", "syslog-old", 0);
 is_deeply $old_data, $d_old, "data stored using recorded_date is retrieved successfully";
 
-my $d2 = $chronicle_r->get("vol_surface", "frxUSDJPY");
+my $d2 = $chronicle_r->get("log", "syslog");
 is_deeply $d, $d2, "data retrieval works";
 
 my $d3 = { xsample1 => [10, 20, 30],
           xsample2 => [40, 50, 60],
           xsample3 => [70, 80, 90] };
 
-is $chronicle_w->set("vol_surface", "frxUSDJPY", $d3), 1, "new version of the data is stored without problem";
+is $chronicle_w->set("log", "syslog", $d3), 1, "new version of the data is stored without problem";
 
-my $d4 = $chronicle_r->get("vol_surface", "frxUSDJPY");
+my $d4 = $chronicle_r->get("log", "syslog");
 is_deeply $d3, $d4, "data retrieval works for the new version";
