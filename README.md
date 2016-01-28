@@ -16,7 +16,9 @@ In addition to caching every incoming data, it is also stored in PostgresSQL for
 This modules hides all the details about caching, database structure and ... from developer. He only needs to call a method
 to save data and another method to retrieve it. All the underlying complexities are handled by the module.
 
-Note that you need to pass handles to `cache_writer`, `cache_reader` and `db_handle` to the appropriate module.
+Note that you will need to pass `cache_writer`, `cache_reader` and `db_handle` to the `Data::Chronicle::Reader/Writer` modules. These three arguments, provide access to your Redis and PostgreSQL which will be used by Chronicle modules.
+
+`cache_writer` and `cache_reader` should be to be able to get/set given data under given key (both of type string). `db_handle` should be capable to store and retrieve data with `category`,`name` in addition to the timestamp of data insertion. So it should be able to retrieve data for a specific timestamp, category and name. Category, name and data are all string. This can simply be achieved by defining a table in you database containing below columns: `timestamp, category, name, value`. 
 
 There are four important methods this module provides:
 
