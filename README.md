@@ -5,7 +5,6 @@ on an efficient storage with below properties:
  
 * **Timeliness**
 It is assumed that data to be stored are time-based meaning they change over time and the latest version is most important for us.
-Many data structures in our system fall into this category (For example Volatility Surfaces, Interest Rate information, ...).
 
 * **Efficient**:
 The module uses Redis cache to provide efficient data storage and retrieval.
@@ -17,7 +16,9 @@ In addition to caching every incoming data, it is also stored in PostgresSQL for
 This modules hides all the details about caching, database structure and ... from developer. He only needs to call a method
 to save data and another method to retrieve it. All the underlying complexities are handled by the module.
 
-Note that you need to pass handles to `cache_writer`, `cache_reader` and `db_handle` to the appropriate module.
+Note that you will need to pass `cache_writer`, `cache_reader` and `db_handle` to the `Data::Chronicle::Reader/Writer` modules. These three arguments, provide access to your Redis and PostgreSQL which will be used by Chronicle modules.
+
+`cache_writer` and `cache_reader` should be to be able to get/set given data under given key (both of type string). `db_handle` should be capable to store and retrieve data with `category`,`name` in addition to the timestamp of data insertion. So it should be able to retrieve data for a specific timestamp, category and name. Category, name and data are all string. This can simply be achieved by defining a table in you database containing below columns: `timestamp, category, name, value`. 
 
 There are four important methods this module provides:
 
@@ -38,7 +39,7 @@ Given a category, name, start_timestamp and end_timestamp returns an array-ref c
 ## Examples ##
 
 ```
-my $d = get_some_data();
+my $d = get_some_log_data();
 
 my $chronicle_w = Data::Chronicle::Writer->new( 
     cache_writer => $writer,
@@ -49,13 +50,14 @@ my $chronicle_r = Data::Chronicle::Reader->new(
     db_handle    => $dbh);
 
 
-#store data into Chronicle
-$chronicle_w->set("vol_surface", "frxUSDJPY", $d);
+#store data into Chronicle - each time we call `set` it will also store 
+#a copy of the data for historical data retrieval
+$chronicle_w->set("log_files", "syslog", $d);
 
-#retrieve latest data stored for "vol_surface" and "frxUSDJPY"
-my $dt = $chronicle_r->get("vol_surface", "frxUSDJPY");
+#retrieve latest data stored for syslog under log_files category
+my $dt = $chronicle_r->get("log_files", "syslog");
 
-#find vol_surface for frxUSDJPY as of a specific date
-my $some_old_data = $chronicle_r->get_for("vol_surface", "frxUSDJPY", $epoch1);
+#find historical data for `syslog` at given point in time
+my $some_old_data = $chronicle_r->get_for("log_files", "syslog", $epoch1);
 
 ```
