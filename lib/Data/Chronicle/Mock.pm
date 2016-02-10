@@ -26,7 +26,10 @@ sub get_mocked_chronicle {
       CONSTRAINT search_index UNIQUE(category,name,timestamp)
     ););
 
-    $dbh->do($stmt);
+    {
+        local $SIG{__WARN__} = sub {};
+        $dbh->do($stmt);
+    }
 
     my $chronicle_r = Data::Chronicle::Reader->new(
         cache_reader    => $redis,

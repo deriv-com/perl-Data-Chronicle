@@ -16,6 +16,13 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,
+        'Test::NoWarnings' => 0,
+        'Date::Utility' => 0,
+        'Moose' => 0,
+        'JSON' => 0,
+        'DBI' => 0,
+        'Test::PostgreSQL' => 0,
+        'Test::Mock::Redis' => 0,
     },
     PREREQ_PM => {
         'Date::Utility' => 0,
