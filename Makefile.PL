@@ -3,11 +3,14 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+#this module required PostgreSQL for its unit-test and mockings
+my $which_psql = `which psql`;
+exit 0 unless $which_psql;
+
 WriteMakefile(
     NAME             => 'Data::Chronicle',
     AUTHOR           => q{Binary.com <support@binary.com>},
     VERSION_FROM     => 'lib/Data/Chronicle/Writer.pm',
-    ABSTRACT_FROM    => 'lib/Data/Chronicle/Writer.pm',
     LICENSE          => 'artistic_2',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.014,
