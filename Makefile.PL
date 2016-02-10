@@ -1,4 +1,4 @@
-use 5.006;
+use 5.014;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -23,6 +23,7 @@ WriteMakefile(
         'Test::NoWarnings' => 0,
         'Date::Utility' => 0,
         'Moose' => 0,
+        'Test::CheckManifest' => 1.29,
         'JSON' => 0,
         'DBI' => 0,
         'Test::PostgreSQL' => 0,

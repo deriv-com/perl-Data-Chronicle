@@ -1,6 +1,12 @@
 package Data::Chronicle::Mock;
 
-use 5.006;
+=head1 NAME
+
+Data::Chronicle::Mock - Mokcing utility to test chronicle based scenarios
+
+=cut
+
+use 5.014;
 use strict;
 use warnings;
 
@@ -9,6 +15,12 @@ use Test::PostgreSQL;
 use Test::Mock::Redis;
 use Data::Chronicle::Reader;
 use Data::Chronicle::Writer;
+
+=head3 C<< my $ch = get_mocked_chronicle(); >>
+
+Creates a simulated chronicle connected to a temporary storage.
+
+=cut
 
 sub get_mocked_chronicle {
     my $redis = Test::Mock::Redis->new(server => 'whatever');

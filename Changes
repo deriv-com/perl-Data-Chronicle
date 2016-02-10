@@ -2,4 +2,9 @@ Revision history for Data-Chronicle
 
 0.01    Jan 26, 2016
         Initial version
-
+0.02    Jan 28, 2016
+        CPAN related fix
+0.03    Feb 4, 2016
+        CPAN related fix
+0.04    Feb 10, 2016
+        Check required libraries before running unit tests
