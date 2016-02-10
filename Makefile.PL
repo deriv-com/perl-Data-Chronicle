@@ -11,6 +11,7 @@ WriteMakefile(
     NAME             => 'Data::Chronicle',
     AUTHOR           => q{Binary.com <support@binary.com>},
     VERSION_FROM     => 'lib/Data/Chronicle/Writer.pm',
+    ABSTRACT         => 'lib/Data/Chronicle/Writer.pm',
     LICENSE          => 'artistic_2',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.014,
