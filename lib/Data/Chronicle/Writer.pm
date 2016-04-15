@@ -10,11 +10,11 @@ Data::Chronicle::Writer - Provides writing to an efficient data storage for vola
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 DESCRIPTION
 
@@ -46,16 +46,16 @@ to save data and another method to retrieve it. All the underlying complexities 
 
  my $d = get_some_log_data();
 
- my $chronicle_w = Data::Chronicle::Writer->new( 
+ my $chronicle_w = Data::Chronicle::Writer->new(
     cache_writer => $writer,
     db_handle    => $dbh);
 
- my $chronicle_r = Data::Chronicle::Reader->new( 
-    cache_reader => $reader, 
+ my $chronicle_r = Data::Chronicle::Reader->new(
+    cache_reader => $reader,
     db_handle    => $dbh);
 
 
- #store data into Chronicle - each time we call `set` it will also store 
+ #store data into Chronicle - each time we call `set` it will also store
  #a copy of the data for historical data retrieval
  $chronicle_w->set("log_files", "syslog", $d);
 
@@ -113,17 +113,8 @@ sub _archive {
     my $db_timestamp = $rec_date->db_timestamp;
 
     return $self->db_handle->prepare(<<'SQL')->execute($category, $name, $value, $db_timestamp);
-WITH ups AS (
-    UPDATE chronicle
-       SET value=$3
-     WHERE timestamp=$4
-       AND category=$1
-       AND name=$2
- RETURNING *
-)
 INSERT INTO chronicle (timestamp, category, name, value)
-SELECT $4, $1, $2, $3
- WHERE NOT EXISTS (SELECT * FROM ups)
+VALUES ($4, $1, $2, $3)
 SQL
 }
 

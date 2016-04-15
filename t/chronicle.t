@@ -18,7 +18,7 @@ my $first_save_epoch = time;
 
 my ($chronicle_r, $chronicle_w) = Data::Chronicle::Mock::get_mocked_chronicle();
 
-is $chronicle_w->set("log", "syslog", $d), 1, "data is stored without problem";
+is $chronicle_w->set("log", "syslog", $d, Date::Utility->new(time)), 1, "data is stored without problem";
 is_deeply $chronicle_r->get("log", "syslog"), $d, "data retrieval works";
 is_deeply $chronicle_r->cache_reader->get("log::syslog"), JSON::to_json($d), "redis has stored correct data";
 
@@ -34,7 +34,7 @@ my $d3 = { xsample1 => [10, 20, 30],
           xsample2 => [40, 50, 60],
           xsample3 => [70, 80, 90] };
 
-is $chronicle_w->set("log", "syslog", $d3), 1, "new version of the data is stored without problem";
+is $chronicle_w->set("log", "syslog", $d3, Date::Utility->new(time + 2)), 1, "new version of the data is stored without problem";
 
 my $d4 = $chronicle_r->get("log", "syslog");
 is_deeply $d3, $d4, "data retrieval works for the new version";
