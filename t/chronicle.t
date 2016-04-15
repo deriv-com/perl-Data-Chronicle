@@ -22,7 +22,7 @@ is $chronicle_w->set("log", "syslog", $d, Date::Utility->new(time)), 1, "data is
 is_deeply $chronicle_r->get("log", "syslog"), $d, "data retrieval works";
 is_deeply $chronicle_r->cache_reader->get("log::syslog"), JSON::to_json($d), "redis has stored correct data";
 
-is $chronicle_w->set("log", "syslog-old", $d_old, Date::Utility->new(time + 1)), 1, "data is stored without problem when specifying recorded date";
+is $chronicle_w->set("log", "syslog-old", $d_old, Date::Utility->new(0)), 1, "data is stored without problem when specifying recorded date";
 
 my $old_data = $chronicle_r->get_for("log", "syslog-old", 0);
 is_deeply $old_data, $d_old, "data stored using recorded_date is retrieved successfully";
