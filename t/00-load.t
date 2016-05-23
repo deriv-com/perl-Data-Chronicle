@@ -11,4 +11,4 @@ BEGIN {
     use_ok( 'Data::Chronicle::Writer' ) || print "Bail out!\n";
 }
 
-diag( "Testing Data::Chronicle $Data::Chronicle::Reader::VERSION, Perl $], $^X" );
+diag( "Testing Data::Chronicle $Data::Chronicle::Writer::VERSION, Perl $], $^X" );

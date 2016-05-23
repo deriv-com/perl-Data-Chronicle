@@ -128,6 +128,8 @@ sub get_for {
 
     my $db_timestamp = Date::Utility->new($date_for)->db_timestamp;
 
+    die "Requesting for historical data without a valid DB connection [$category,$name,$date_for]" if not defined $self->db_handle;
+
     my $db_data =
         $self->db_handle->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
         'id', {}, $category, $name, $db_timestamp);
@@ -149,6 +151,8 @@ sub get_for_period {
 
     my $start_timestamp = Date::Utility->new($start)->db_timestamp;
     my $end_timestamp   = Date::Utility->new($end)->db_timestamp;
+
+    die "Requesting for historical period data without a valid DB connection [$category,$name]" if not defined $self->db_handle;
 
     my $db_data =
         $self->db_handle->selectall_hashref(
