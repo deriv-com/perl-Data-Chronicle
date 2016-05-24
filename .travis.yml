@@ -25,3 +25,4 @@ before_install:
     - "cpanm JSON"
 script:
   perl Makefile.PL && make test
+
