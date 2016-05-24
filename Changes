@@ -2,4 +2,5 @@ Revision history for Data-Chronicle
 
 0.01    Jan 26, 2016
         Initial version
-
+0.02    May 23, 2016
+        Produce better error message in case there is no DB connection and request received for historical information
