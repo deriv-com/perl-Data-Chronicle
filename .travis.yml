@@ -17,12 +17,12 @@ before_install:
     - source ~/travis-perl-helpers/init
     - build-perl
     - perl -V
-    - "cpanm Date::Utility" 
-    - "cpanm Test::Mock::Redis"
-    - "cpanm Test::PostgreSQL"
-    - "cpanm DBI"
-    - "cpanm Moose"
-    - "cpanm JSON"
+    - "cpanm -n Date::Utility" 
+    - "cpanm -n Test::Mock::Redis"
+    - "cpanm -n Test::PostgreSQL"
+    - "cpanm -n DBI"
+    - "cpanm -n Moose"
+    - "cpanm -n JSON"
 script:
   perl Makefile.PL && make test
 
