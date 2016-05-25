@@ -8,14 +8,6 @@ use warnings;
 
 Data::Chronicle::Reader - Provides reading from an efficient data storage for volatile and time-based data
 
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
 =head1 DESCRIPTION
 
 This module contains helper methods which can be used to store and retrieve information
@@ -141,6 +133,12 @@ sub get_for {
 
     return JSON::from_json($db_value);
 }
+
+=head3 C<< my $data = get_for_period("category1", "name1", 1447401505, 1447401900) >>
+
+Query Pg historical data and return records whose date is between given period.
+
+=cut
 
 sub get_for_period {
     my $self     = shift;

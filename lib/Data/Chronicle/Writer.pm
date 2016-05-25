@@ -10,11 +10,11 @@ Data::Chronicle::Writer - Provides writing to an efficient data storage for vola
 
 =head1 VERSION
 
-Version 0.01
+Version 0.05
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 =head1 DESCRIPTION
 
