@@ -8,14 +8,6 @@ use warnings;
 
 Data::Chronicle::Reader - Provides reading from an efficient data storage for volatile and time-based data
 
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
 =head1 DESCRIPTION
 
 This module contains helper methods which can be used to store and retrieve information
@@ -128,6 +120,8 @@ sub get_for {
 
     my $db_timestamp = Date::Utility->new($date_for)->db_timestamp;
 
+    die "Requesting for historical data without a valid DB connection [$category,$name,$date_for]" if not defined $self->db_handle;
+
     my $db_data =
         $self->db_handle->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
         'id', {}, $category, $name, $db_timestamp);
@@ -140,6 +134,12 @@ sub get_for {
     return JSON::from_json($db_value);
 }
 
+=head3 C<< my $data = get_for_period("category1", "name1", 1447401505, 1447401900) >>
+
+Query Pg historical data and return records whose date is between given period.
+
+=cut
+
 sub get_for_period {
     my $self     = shift;
     my $category = shift;
@@ -149,6 +149,8 @@ sub get_for_period {
 
     my $start_timestamp = Date::Utility->new($start)->db_timestamp;
     my $end_timestamp   = Date::Utility->new($end)->db_timestamp;
+
+    die "Requesting for historical period data without a valid DB connection [$category,$name]" if not defined $self->db_handle;
 
     my $db_data =
         $self->db_handle->selectall_hashref(
