@@ -42,23 +42,33 @@ Note that you will need to pass `cache_writer`, `cache_reader` and `db_handle` t
 
 There are four important methods this module provides:
 
-=head2 set (in L<Data::Chronicle::Writer>)
+=head2 L<Data::Chronicle::Writer/set>
 
 Given a category, name and value stores the JSONified value in Redis and PostgreSQL database under "category::name" group and also stores current
 system time as the timestamp for the data (Which can be used for future retrieval if we want to get data as of a specific time). Note that the value
 MUST be either hash-ref or array-ref.
 
-=head2 get (in L<Data::Chronicle::Reader>)
+    $writer->set("category1", "name1", "value1");
+    $writer->set("category1", "name2", "value2", Date::Utility->new("2016-08-01 00:06:00"));
+
+=head2 L<Data::Chronicle::Reader/get>
 
 Given a category and name returns the latest version of the data according to current Redis cache
 
-=head2 get_for (in L<Data::Chronicle::Reader>)
+    my $value1 = $reader->get("category1, "name1"); #value1
+
+=head2 L<Data::Chronicle::Reader/get_for>
 
 Given a category, name and timestamp returns version of data under "category::name" as of the given date (using a DB lookup).
 
-=head2 get_for_period (in Data::Chronicle::Reader)
+    my $some_old_data = $reader->get_for("category1", "name2", Date::Utility->new("2016-08-01 00:06:00"));
+
+
+=head2 L<Data::Chronicle::Reader/get_for_period>
 
 Given a category, name, start_timestamp and end_timestamp returns an array-ref containing all data stored between given period for the given "category::name" (using a DB lookup).
+
+    my $arrayref = $reader->get_for_period("category1", "name2", Date::Utility->new("2015-08-01 00:06:00"), Date::Utility->new("2015-08-01 00:06:00"));
 
 =head1 Examples
 
