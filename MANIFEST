@@ -1,4 +1,3 @@
-.travis.yml
 Changes
 lib/Data/Chronicle.pm
 lib/Data/Chronicle/Mock.pm
