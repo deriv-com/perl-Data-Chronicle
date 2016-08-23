@@ -3,10 +3,15 @@ package Data::Chronicle::Reader;
 use 5.014;
 use strict;
 use warnings;
+use Data::Chronicle;
 
 =head1 NAME
 
 Data::Chronicle::Reader - Provides reading from an efficient data storage for volatile and time-based data
+
+=cut
+
+our $VERSION = $Data::Chronicle::VERSION;
 
 =head1 DESCRIPTION
 

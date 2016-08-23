@@ -3,18 +3,15 @@ package Data::Chronicle::Writer;
 use 5.014;
 use strict;
 use warnings;
+use Data::Chronicle;
 
 =head1 NAME
 
 Data::Chronicle::Writer - Provides writing to an efficient data storage for volatile and time-based data
 
-=head1 VERSION
-
-Version 0.05
-
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = $Data::Chronicle::VERSION;
 
 =head1 DESCRIPTION
 
