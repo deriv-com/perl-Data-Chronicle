@@ -7,10 +7,10 @@ use Test::More;
 plan tests => 4;
 
 BEGIN {
-    use_ok( 'Data::Chronicle' ) || print "Bail out!\n";
-    use_ok( 'Data::Chronicle::Reader' ) || print "Bail out!\n";
-    use_ok( 'Data::Chronicle::Writer' ) || print "Bail out!\n";
-    use_ok( 'Data::Chronicle::Mock' ) || print "Bail out!\n";
+    use_ok( 'Data::Chronicle' );
+    use_ok( 'Data::Chronicle::Reader' );
+    use_ok( 'Data::Chronicle::Writer' );
+    use_ok( 'Data::Chronicle::Mock' );
 }
 
 diag( "Testing Data::Chronicle $Data::Chronicle::VERSION, Perl $], $^X" );
