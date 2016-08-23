@@ -4,6 +4,14 @@ package Data::Chronicle;
 
 Data::Chronicle - Chronicle storage system
 
+=head1 VERSION
+
+Version 0.06
+
+=cut
+
+our $VERSION = '0.06';
+
 =head1 DESCRIPTION
 
 This package contains two modules (Reader and Writer) which can be used to store and retrieve information

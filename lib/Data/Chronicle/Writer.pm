@@ -8,14 +8,6 @@ use warnings;
 
 Data::Chronicle::Writer - Provides writing to an efficient data storage for volatile and time-based data
 
-=head1 VERSION
-
-Version 0.05
-
-=cut
-
-our $VERSION = '0.05';
-
 =head1 DESCRIPTION
 
 This module contains helper methods which can be used to store and retrieve information
