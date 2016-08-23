@@ -1,5 +1,6 @@
 .travis.yml
 Changes
+lib/Data/Chronicle.pm
 lib/Data/Chronicle/Mock.pm
 lib/Data/Chronicle/Reader.pm
 lib/Data/Chronicle/Writer.pm
