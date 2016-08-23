@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 3;
+plan tests => 4;
 
 BEGIN {
     use_ok( 'Data::Chronicle' ) || print "Bail out!\n";
