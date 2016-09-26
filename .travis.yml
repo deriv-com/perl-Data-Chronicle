@@ -1,4 +1,6 @@
 language: perl
+matrix:
+    fast_finish: true
 addons:
     postgresql: "9.4"
 services:
