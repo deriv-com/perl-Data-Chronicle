@@ -1,5 +1,8 @@
 # Chronicle storage system (perl-Data-Chronicle)
 
+[![Build Status](https://travis-ci.org/binary-com/perl-Data-Chronicle.svg?branch=master)](https://travis-ci.org/binary-com/perl-Data-Chronicle)
+[![codecov](https://codecov.io/gh/binary-com/perl-Data-Chronicle/branch/master/graph/badge.svg)](https://codecov.io/gh/binary-com/perl-Data-Chronicle)
+
 This repository contains two modules (Reader and Writer) which can be used to store and retrieve information
 on an efficient storage with below properties:
  
