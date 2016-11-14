@@ -25,6 +25,9 @@ before_install:
     - "cpanm -n DBI"
     - "cpanm -n Moose"
     - "cpanm -n JSON"
+    - "cpanm -qn Test::Requires::Git"
+    - "cpanm -qn Devel::Cover::Report::Codecov"
 script:
-  perl Makefile.PL && RELEASE_TESTING=1 make test
-
+    perl Makefile.PL && RELEASE_TESTING=1 make test
+after_success:
+    RELEASE_TESTING=1 cover -test -report codecov
