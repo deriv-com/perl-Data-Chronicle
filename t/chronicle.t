@@ -24,7 +24,7 @@ throws_ok {
 } qr/Recorded date is undefined/, 'throws warning if recorded date is undef';
 throws_ok {
     $chronicle_w->set("log", "syslog", $d, 1);
-} qr/Recorded date is undefined/, 'throws warning if recorded date is not Date::Utility object';
+} qr/Recorded date is not/, 'throws warning if recorded date is not Date::Utility object';
 is $chronicle_w->set("log", "syslog", $d, Date::Utility->new), 1, "data is stored without problem";
 is_deeply $chronicle_r->get("log", "syslog"), $d, "data retrieval works";
 is_deeply $chronicle_r->cache_reader->get("log::syslog"), JSON::to_json($d), "redis has stored correct data";
