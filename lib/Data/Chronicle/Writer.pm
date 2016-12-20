@@ -85,9 +85,9 @@ sub set {
     my $name     = shift;
     my $value    = shift;
     my $rec_date = shift;
+    my $archive  = shift;
 
-    $rec_date //= Date::Utility->new();
-
+    die "Recorded date is undefined" unless $rec_date or ref $rec_date ne 'Date::Utility';
     die "Cannot store undefined values in Chronicle!" unless defined $value;
     die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
 
@@ -95,7 +95,7 @@ sub set {
 
     my $key = $category . '::' . $name;
     $self->cache_writer->set($key, $value);
-    $self->_archive($category, $name, $value, $rec_date) if $self->db_handle;
+    $self->_archive($category, $name, $value, $rec_date) if $archive and $self->db_handle;
 
     return 1;
 }
