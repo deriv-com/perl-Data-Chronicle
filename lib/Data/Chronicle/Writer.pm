@@ -88,7 +88,7 @@ sub set {
     my $archive  = shift;
 
     $archive //= 1;    #default to true
-    die "Recorded date is undefined" unless $rec_date or ref $rec_date ne 'Date::Utility';
+    die "Recorded date is undefined" if not $rec_date and ref $rec_date ne 'Date::Utility';
     die "Cannot store undefined values in Chronicle!" unless defined $value;
     die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
 

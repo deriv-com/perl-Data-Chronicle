@@ -21,6 +21,7 @@ WriteMakefile(
     BUILD_REQUIRES => {
         'Test::More' => 0,
         'Test::NoWarnings' => 0,
+        'Test::Exception' => 0,
         'Date::Utility' => 0,
         'Moose' => 0,
         'Test::CheckManifest' => 1.29,
