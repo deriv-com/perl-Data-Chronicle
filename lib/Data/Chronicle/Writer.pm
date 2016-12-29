@@ -45,10 +45,11 @@ to save data and another method to retrieve it. All the underlying complexities 
 
  my $chronicle_w = Data::Chronicle::Writer->new( 
     cache_writer => $writer,
-    db_handle    => $dbh);
+    db_handle    => $dbh,
+    ttl          => 86400);
 
  my $chronicle_r = Data::Chronicle::Reader->new( 
-    cache_reader => $reader, 
+    cache_reader => $reader,
     db_handle    => $dbh);
 
 
@@ -71,6 +72,12 @@ use Moose;
 has [qw(cache_writer db_handle)] => (
     is      => 'ro',
     default => undef,
+);
+
+has 'ttl' => (
+    isa      => 'Int',
+    is       => 'ro',
+    required => 1
 );
 
 =head3 C<< set("category1", "name1", $value1)  >>
@@ -96,7 +103,7 @@ sub set {
     $value = JSON::to_json($value);
 
     my $key = $category . '::' . $name;
-    $self->cache_writer->set($key, $value);
+    $self->cache_writer->set($key, $value, $self->ttl);
     $self->_archive($category, $name, $value, $rec_date) if $archive and $self->db_handle;
 
     return 1;

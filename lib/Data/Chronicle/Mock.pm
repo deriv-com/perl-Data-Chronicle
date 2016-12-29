@@ -49,7 +49,8 @@ sub get_mocked_chronicle {
 
     my $chronicle_w = Data::Chronicle::Writer->new(
         cache_writer    => $redis,
-        db_handle       => $dbh);
+        db_handle       => $dbh,
+        ttl             => 86400);
 
 
     #we need to store a reference to $pgsql or else, as soon as this method

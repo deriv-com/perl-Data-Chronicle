@@ -21,6 +21,8 @@ my $first_save_epoch = time;
 
 my ($chronicle_r, $chronicle_w) = Data::Chronicle::Mock::get_mocked_chronicle();
 
+is $chronicle_w->ttl, 86400, 'Writer has ttl';
+
 throws_ok {
     $chronicle_w->set("log", "syslog", $d);
 }
