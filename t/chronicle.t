@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Test::NoWarnings;
 use Test::Exception;
 use Data::Chronicle::Mock;
