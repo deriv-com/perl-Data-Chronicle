@@ -10,5 +10,5 @@ Revision history for Data-Chronicle
         Check required libraries before running unit tests
 0.05    May 25, 2016
         Produce better error message in case there is no DB connection and request received for historical information
-0.08    December 30, 2016
+???     December 30, 2016
         Added ttl - requered attribute to Data::Chronicle::Writer, used to set TTL for data stored in Redis
