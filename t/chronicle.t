@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 15;
 use Test::NoWarnings;
 use Test::Exception;
 use Data::Chronicle::Mock;
@@ -50,3 +50,16 @@ is $chronicle_w->set("log", "syslog", $d3, Date::Utility->new), 1, "new version 
 
 my $d4 = $chronicle_r->get("log", "syslog");
 is_deeply $d3, $d4, "data retrieval works for the new version";
+
+my $hash_ref = {
+    'A::B' => 1,
+    'C::D' => 2,
+    'Test::Data' => 0,
+};
+
+$chronicle_r = Data::Chronicle::Reader->new({ memory_map => $hash_ref });
+
+is $chronicle_r->get('A', 'B'), 1, 'correct data being read from memory mapped chronicle';
+is $chronicle_r->get('C', 'D'), 2, 'correct data being read from memory mapped chronicle';
+is $chronicle_r->get('Test', 'Data'), 0, 'correct data being read from memory mapped chronicle';
+is $chronicle_r->get('Test1', 'Data'), undef, 'correct missing data being read from memory mapped chronicle';
