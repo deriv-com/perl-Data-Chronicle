@@ -71,6 +71,8 @@ Given a category, name and timestamp returns version of data under "category::na
     cache_reader => $reader, 
     db_handle    => $dbh);
 
+ my $chronicle_r2 = Data::Chronicle::Reader->new(
+    memory_map   => $hash_ref);
 
  #store data into Chronicle - each time we call `set` it will also store 
  #a copy of the data for historical data retrieval
@@ -93,6 +95,11 @@ has [qw(cache_reader db_handle)] => (
     default => undef,
 );
 
+#Alternatively you can pass a memory-based hash which will be used to fetch data
+has memory_map => (
+    is      => 'ro',
+);
+
 =head3 C<< my $data = get("category1", "name1") >>
 
 Query for the latest data under "category1::name1" from Redis.
@@ -105,9 +112,16 @@ sub get {
     my $name     = shift;
 
     my $key         = $category . '::' . $name;
-    my $cached_data = $self->cache_reader->get($key);
 
-    return JSON::from_json($cached_data) if defined $cached_data;
+    if ( defined $self->cache_reader ) {
+        my $cached_data = $self->cache_reader->get($key);
+        return JSON::from_json($cached_data) if defined $cached_data;
+    }
+
+    if ( defined $self->memory_map ) {
+        return $self->memory_map->{$key};
+    }
+
     return;
 }
 
