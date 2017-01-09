@@ -10,3 +10,5 @@ Revision history for Data-Chronicle
         Check required libraries before running unit tests
 0.05    May 25, 2016
         Produce better error message in case there is no DB connection and request received for historical information
+0.09    Jan 9, 2016
+        Adding support for a memory-based storage

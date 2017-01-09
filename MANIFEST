@@ -1,5 +1,6 @@
 .travis.yml
 Changes
+Data-Chronicle-0.08.tar.gz
 lib/Data/Chronicle.pm
 lib/Data/Chronicle/Mock.pm
 lib/Data/Chronicle/Reader.pm
