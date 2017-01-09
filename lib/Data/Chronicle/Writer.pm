@@ -103,7 +103,7 @@ sub set {
     $value = JSON::to_json($value);
 
     my $key = $category . '::' . $name;
-    $self->cache_writer->set($key => $value, $self->ttl ? 'EX' => $self->ttl : ());
+    $self->cache_writer->set($key => $value, $self->ttl ? ('EX' => $self->ttl) : ());
     $self->_archive($category, $name, $value, $rec_date) if $archive and $self->db_handle;
 
     return 1;
