@@ -57,7 +57,7 @@ my $hash_ref = {
     'Test::Data' => 0,
 };
 
-$chronicle_r = Data::Chronicle::Reader->new({ memory_map => $hash_ref });
+$chronicle_r = Data::Chronicle::Reader->new({ cache_reader => $hash_ref });
 
 is $chronicle_r->get('A', 'B'), 1, 'correct data being read from memory mapped chronicle';
 is $chronicle_r->get('C', 'D'), 2, 'correct data being read from memory mapped chronicle';
