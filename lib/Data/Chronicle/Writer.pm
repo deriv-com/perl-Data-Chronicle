@@ -77,7 +77,7 @@ has [qw(cache_writer db_handle)] => (
 has 'ttl' => (
     isa      => 'Int',
     is       => 'ro',
-    required => 1
+    default  => undef,
 );
 
 =head3 C<< set("category1", "name1", $value1)  >>
@@ -103,7 +103,7 @@ sub set {
     $value = JSON::to_json($value);
 
     my $key = $category . '::' . $name;
-    $self->cache_writer->set($key, $value, $self->ttl);
+    $self->cache_writer->set($key => $value, $self->ttl ? 'EX' => $self->ttl : ());
     $self->_archive($category, $name, $value, $rec_date) if $archive and $self->db_handle;
 
     return 1;
