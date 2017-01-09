@@ -75,7 +75,7 @@ has [qw(cache_writer db_handle)] => (
 );
 
 has 'ttl' => (
-    isa      => 'Int',
+    isa      => 'Maybe[Int]',
     is       => 'ro',
     default  => undef,
 );
