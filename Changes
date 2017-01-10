@@ -1,5 +1,7 @@
 Revision history for Data-Chronicle
 
+0.09    January 9, 2017
+        Fixes a test plan issue in the usage of Test::NoWarnings in the previous release.
 0.08    January 9, 2017
         Added ttl - optional attribute to Data::Chronicle::Writer, used to set TTL for data stored in Redis
         Adding support for in-memory, hashref-based storage
