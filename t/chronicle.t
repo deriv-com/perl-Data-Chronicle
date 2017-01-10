@@ -2,10 +2,11 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::NoWarnings;
 use Test::Exception;
 use Data::Chronicle::Mock;
 use Date::Utility;
+
+require Test::NoWarnings;
 
 my $d = {
     sample1 => [1, 2, 3],
@@ -66,5 +67,6 @@ is $chronicle_r->get('C', 'D'), 2, 'correct data being read from memory mapped c
 is $chronicle_r->get('Test', 'Data'), 0, 'correct data being read from memory mapped chronicle';
 is $chronicle_r->get('Test1', 'Data'), undef, 'correct missing data being read from memory mapped chronicle';
 
-done_testing;
+Test::NoWarnings::had_no_warnings();
+done_testing();
 
