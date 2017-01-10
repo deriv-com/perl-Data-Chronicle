@@ -71,6 +71,8 @@ Given a category, name and timestamp returns version of data under "category::na
     cache_reader => $reader, 
     db_handle    => $dbh);
 
+ my $chronicle_r2 = Data::Chronicle::Reader->new(
+    cache_reader => $hash_ref);
 
  #store data into Chronicle - each time we call `set` it will also store 
  #a copy of the data for historical data retrieval
@@ -88,6 +90,13 @@ use JSON;
 use Date::Utility;
 use Moose;
 
+=head2 cache_reader
+
+cahce_reader can be an object which has `get` method used to fetch data.
+or it can be a plain hash-ref.
+
+=cut
+
 has [qw(cache_reader db_handle)] => (
     is      => 'ro',
     default => undef,
@@ -95,7 +104,8 @@ has [qw(cache_reader db_handle)] => (
 
 =head3 C<< my $data = get("category1", "name1") >>
 
-Query for the latest data under "category1::name1" from Redis.
+Query for the latest data under "category1::name1" from the cache reader.
+Will return `undef` if the data does not exist.
 
 =cut
 
@@ -104,11 +114,16 @@ sub get {
     my $category = shift;
     my $name     = shift;
 
-    my $key         = $category . '::' . $name;
-    my $cached_data = $self->cache_reader->get($key);
+    my $key      = $category . '::' . $name;
 
-    return JSON::from_json($cached_data) if defined $cached_data;
-    return;
+    if ( blessed($self->cache_reader) ) {
+        my $cached_data = $self->cache_reader->get($key);
+        return JSON::from_json($cached_data) if defined $cached_data;
+    } else {
+        return $self->cache_reader->{$key};
+    }
+
+    return undef;
 }
 
 =head3 C<< my $data = get_for("category1", "name1", 1447401505) >>
