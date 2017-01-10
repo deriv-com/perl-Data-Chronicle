@@ -74,13 +74,29 @@ has [qw(cache_writer db_handle)] => (
     default => undef,
 );
 
+=head1 METHODS
+
+=head2 ttl
+
+If a TTL value is provided when constructing the instance, this will be used as the expiry time for the data.
+
+Expiry time is not currently recorded in the PostgreSQL database backend - it is only used for the cache layer.
+
+This represents the seconds until expiry, and default is C<undef>, meaning that keys will not expire.
+
+=cut
+
 has 'ttl' => (
     isa      => 'Maybe[Int]',
     is       => 'ro',
     default  => undef,
 );
 
-=head3 C<< set("category1", "name1", $value1)  >>
+=head2 set
+
+Example:
+
+    $chronicle_writer->set("category1", "name1", $value1);
 
 Store a piece of data "value1" under key "category1::name1" in Pg and Redis.
 
