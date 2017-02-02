@@ -1,11 +1,7 @@
-use 5.014;
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
 
-#this module required PostgreSQL for its unit-test and mockings
-my $which_psql = `which psql`;
-exit 0 unless $which_psql;
+use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME               => 'Data::Chronicle',
