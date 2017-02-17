@@ -25,7 +25,7 @@ The module uses Redis cache to provide efficient data storage and retrieval.
 
 =head2 Persistent
 
-In addition to caching every incoming data, it is also stored in PostgresSQL for future retrieval.
+In addition to caching every incoming data, it is also stored in PostgreSQL for future retrieval.
 
 =head2 Transparent
 
@@ -77,7 +77,7 @@ Given a category, name, start_timestamp and end_timestamp returns an array-ref c
         db_handle    => $dbh);
 
     my $chronicle_r = Data::Chronicle::Reader->new(
-        cache_reader => $reader, 
+        cache_reader => $reader,
         db_handle    => $dbh);
 
 
