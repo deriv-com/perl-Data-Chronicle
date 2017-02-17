@@ -11,7 +11,7 @@ Data::Chronicle::Reader - Provides reading from an efficient data storage for vo
 
 =cut
 
-our $VERSION = $Data::Chronicle::VERSION;
+## VERSION
 
 =head1 DESCRIPTION
 

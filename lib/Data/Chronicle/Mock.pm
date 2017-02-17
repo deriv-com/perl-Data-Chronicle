@@ -16,6 +16,8 @@ use Test::Mock::Redis;
 use Data::Chronicle::Reader;
 use Data::Chronicle::Writer;
 
+## VERSION
+
 =head3 C<< my $ch = get_mocked_chronicle(); >>
 
 Creates a simulated chronicle connected to a temporary storage.

@@ -11,7 +11,7 @@ Data::Chronicle::Writer - Provides writing to an efficient data storage for vola
 
 =cut
 
-our $VERSION = $Data::Chronicle::VERSION;
+## VERSION
 
 =head1 DESCRIPTION
 

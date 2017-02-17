@@ -1,3 +1,4 @@
+sudo: false
 language: perl
 matrix:
     fast_finish: true
@@ -5,29 +6,21 @@ addons:
     postgresql: "9.4"
 services:
     - postgresql
-env:
-    - RELEASE_TESTING
 perl:
-    - "5.24"
-    - "5.22"
-    - "5.20"
-    - "5.18"
-    - "5.16"
-    - "5.14"
+   - '5.24'
+   - '5.22'
+   - '5.20'
+   - '5.18'
+   - '5.16'
+   - '5.14'
 before_install:
-    - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
-    - source ~/travis-perl-helpers/init
-    - build-perl
-    - perl -V
-    - "cpanm -n Date::Utility" 
-    - "cpanm -n Test::Mock::Redis"
-    - "cpanm -n Test::PostgreSQL"
-    - "cpanm -n DBI"
-    - "cpanm -n Moose"
-    - "cpanm -n JSON"
-    - "cpanm -qn Test::Requires::Git"
-    - "cpanm -qn Devel::Cover::Report::Codecov"
+   - git config --global user.name "TravisCI"
+   - git config --global user.email $HOSTNAME":not-for-mail@travis-ci.org"
+install:
+   - cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover App::cpm Devel::Cover::Report::Codecov
+   - cpm install -w 2 --mirror=http://cpan.cpantesters.org/ -g $(dzil authordeps --missing)
+   - cpm install -w 2 --mirror=http://cpan.cpantesters.org/ -g $(dzil listdeps --author --missing)
+
 script:
-    perl Makefile.PL && RELEASE_TESTING=1 make test
-after_success:
-    RELEASE_TESTING=1 cover -test -report codecov
+   - dzil smoke --release --author && dzil cover -test -report codecov && dzil xtest
+
