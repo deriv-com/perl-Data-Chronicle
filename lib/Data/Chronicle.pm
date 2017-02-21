@@ -1,16 +1,14 @@
 package Data::Chronicle;
+use strict;
+use warnings;
 
 =head1 NAME
 
 Data::Chronicle - Chronicle storage system
 
-=head1 VERSION
-
-Version 0.10
-
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 DESCRIPTION
 
@@ -27,7 +25,7 @@ The module uses Redis cache to provide efficient data storage and retrieval.
 
 =head2 Persistent
 
-In addition to caching every incoming data, it is also stored in PostgresSQL for future retrieval.
+In addition to caching every incoming data, it is also stored in PostgreSQL for future retrieval.
 
 =head2 Transparent
 
@@ -36,7 +34,7 @@ to save data and another method to retrieve it. All the underlying complexities 
 
 Note that you will need to pass `cache_writer`, `cache_reader` and `db_handle` to the `Data::Chronicle::Reader/Writer` modules. These three arguments, provide access to your Redis and PostgreSQL which will be used by Chronicle modules.
 
-`cache_writer` and `cache_reader` should be to be able to get/set given data under given key (both of type string). `db_handle` should be capable to store and retrieve data with `category`,`name` in addition to the timestamp of data insertion. So it should be able to retrieve data for a specific timestamp, category and name. Category, name and data are all string. This can easily be achieved by defining a table in you database containing these columns: `timestamp, category, name, value`. 
+`cache_writer` and `cache_reader` should be to be able to get/set given data under given key (both of type string). `db_handle` should be capable to store and retrieve data with `category`,`name` in addition to the timestamp of data insertion. So it should be able to retrieve data for a specific timestamp, category and name. Category, name and data are all string. This can easily be achieved by defining a table in you database containing these columns: `timestamp, category, name, value`.
 
 =head1 METHODS
 
@@ -73,26 +71,25 @@ Given a category, name, start_timestamp and end_timestamp returns an array-ref c
 =head1 Examples
 
     my $d = get_some_log_data();
-    
-    my $chronicle_w = Data::Chronicle::Writer->new( 
+
+    my $chronicle_w = Data::Chronicle::Writer->new(
         cache_writer => $writer,
         db_handle    => $dbh);
-    
-    my $chronicle_r = Data::Chronicle::Reader->new( 
-        cache_reader => $reader, 
+
+    my $chronicle_r = Data::Chronicle::Reader->new(
+        cache_reader => $reader,
         db_handle    => $dbh);
-    
-    
-    #store data into Chronicle - each time we call `set` it will also store 
+
+
+    #store data into Chronicle - each time we call `set` it will also store
     #a copy of the data for historical data retrieval
     $chronicle_w->set("log_files", "syslog", $d);
-    
+
     #retrieve latest data stored for syslog under log_files category
     my $dt = $chronicle_r->get("log_files", "syslog");
-    
+
     #find historical data for `syslog` at given point in time
     my $some_old_data = $chronicle_r->get_for("log_files", "syslog", $epoch1);
-    
 
 =cut
 

@@ -1,5 +1,10 @@
 Revision history for Data-Chronicle
 
+{{$NEXT}}
+
+0.11      2017-02-21 01:48:57+00:00 UTC
+        Switch to dzil
+0.10
 0.09    January 9, 2017
         Fixes a test plan issue in the usage of Test::NoWarnings in the previous release.
 0.08    January 9, 2017
