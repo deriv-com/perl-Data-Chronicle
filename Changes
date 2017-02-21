@@ -1,6 +1,8 @@
 Revision history for Data-Chronicle
 
 {{$NEXT}}
+
+0.11      2017-02-21 01:48:57+00:00 UTC
         Switch to dzil
 0.10
 0.09    January 9, 2017
