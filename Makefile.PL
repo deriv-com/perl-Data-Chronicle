@@ -20,7 +20,8 @@ my %WriteMakefileArgs = (
     "DBI" => 0,
     "Date::Utility" => 0,
     "JSON" => 0,
-    "Moose" => 0
+    "Moose" => 0,
+    "Test::PostgreSQL" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -31,10 +32,9 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::Mock::Redis" => 0,
     "Test::More" => "0.94",
-    "Test::NoWarnings" => 0,
-    "Test::PostgreSQL" => 0
+    "Test::NoWarnings" => 0
   },
-  "VERSION" => "0.11",
+  "VERSION" => "0.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
