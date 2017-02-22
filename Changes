@@ -2,6 +2,9 @@ Revision history for Data-Chronicle
 
 {{$NEXT}}
 
+0.13      2017-02-22 01:17:27+00:00 UTC
+          fix dependency for Test::Mock::Redis
+
 0.12      2017-02-21 09:51:19+00:00 UTC
           fix dependency for Test::Postgresql
 

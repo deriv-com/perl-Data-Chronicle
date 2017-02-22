@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Date::Utility" => 0,
     "JSON" => 0,
     "Moose" => 0,
+    "Test::Mock::Redis" => 0,
     "Test::PostgreSQL" => 0
   },
   "TEST_REQUIRES" => {
@@ -30,11 +31,10 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::CheckDeps" => "0.010",
     "Test::Exception" => 0,
-    "Test::Mock::Redis" => 0,
     "Test::More" => "0.94",
     "Test::NoWarnings" => 0
   },
-  "VERSION" => "0.12",
+  "VERSION" => "0.13",
   "test" => {
     "TESTS" => "t/*.t"
   }
