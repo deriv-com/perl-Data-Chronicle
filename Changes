@@ -2,6 +2,9 @@ Revision history for Data-Chronicle
 
 {{$NEXT}}
 
+0.12      2017-02-21 09:51:19+00:00 UTC
+          fix dependency for Test::Postgresql
+
 0.11      2017-02-21 01:48:57+00:00 UTC
         Switch to dzil
 0.10
