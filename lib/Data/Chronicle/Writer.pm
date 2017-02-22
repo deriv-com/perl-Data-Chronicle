@@ -92,7 +92,7 @@ has 'ttl' => (
     default => undef,
 );
 
-=head publish_on_set
+=head2 publish_on_set
 
 Will invoke
 
