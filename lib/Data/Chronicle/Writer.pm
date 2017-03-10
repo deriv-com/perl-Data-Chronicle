@@ -137,11 +137,17 @@ sub set {
 
     $value = JSON::to_json($value);
 
-    my $key = $category . '::' . $name;
-    $self->cache_writer->publish($key, $value) if $self->publish_on_set;
-    $self->cache_writer->set(
+    my $key    = $category . '::' . $name;
+    my $writer = $self->cache_writer;
+
+    # publish & set in transaction
+    $writer->multi;
+    $writer->publish($key, $value) if $self->publish_on_set;
+    $writer->set(
         $key => $value,
         $self->ttl ? ('EX' => $self->ttl) : ());
+    $writer->exec;
+
     $self->_archive($category, $name, $value, $rec_date) if $archive and $self->db_handle;
 
     return 1;

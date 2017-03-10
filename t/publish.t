@@ -11,6 +11,9 @@ package t::InMemoryCache {
 
     has cache => (is => 'ro', default => sub { {} });
 
+    sub multi {}
+    sub exec {}
+
     sub set {
         my ($self, $key, $value) = @_;
         $self->cache->{"set::$key"} = $value;
