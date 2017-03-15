@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Data::Chronicle",
   "PREREQ_PM" => {
-    "DBD::pg" => 0,
+    "DBD::Pg" => 0,
     "DBI" => 0,
     "Date::Utility" => 0,
     "JSON" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "DBD::pg" => 0,
+  "DBD::Pg" => 0,
   "DBI" => 0,
   "Date::Utility" => 0,
   "ExtUtils::MakeMaker" => 0,
