@@ -87,9 +87,27 @@ This represents the seconds until expiry, and default is C<undef>, meaning that 
 =cut
 
 has 'ttl' => (
-    isa      => 'Maybe[Int]',
-    is       => 'ro',
-    default  => undef,
+    isa     => 'Maybe[Int]',
+    is      => 'ro',
+    default => undef,
+);
+
+=head2 publish_on_set
+
+Will invoke
+
+    $cache_writer->publish("$category::$name1", $value);
+
+if set to true. This is useful, if to provide redis or postgres notificaitons on new data.
+
+Default value: 0 (false)
+
+=cut
+
+has 'publish_on_set' => (
+    isa     => 'Int',
+    is      => 'ro',
+    default => sub { 0 },
 );
 
 =head2 set
@@ -98,7 +116,8 @@ Example:
 
     $chronicle_writer->set("category1", "name1", $value1);
 
-Store a piece of data "value1" under key "category1::name1" in Pg and Redis.
+Store a piece of data "value1" under key "category1::name1" in Pg and Redis. Will
+publish "category1::name1" in Redis if C<publish_on_set> is true.
 
 =cut
 
@@ -118,8 +137,17 @@ sub set {
 
     $value = JSON::to_json($value);
 
-    my $key = $category . '::' . $name;
-    $self->cache_writer->set($key => $value, $self->ttl ? ('EX' => $self->ttl) : ());
+    my $key    = $category . '::' . $name;
+    my $writer = $self->cache_writer;
+
+    # publish & set in transaction
+    $writer->multi;
+    $writer->publish($key, $value) if $self->publish_on_set;
+    $writer->set(
+        $key => $value,
+        $self->ttl ? ('EX' => $self->ttl) : ());
+    $writer->exec;
+
     $self->_archive($category, $name, $value, $rec_date) if $archive and $self->db_handle;
 
     return 1;

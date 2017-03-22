@@ -2,6 +2,11 @@ Revision history for Data-Chronicle
 
 {{$NEXT}}
 
+0.14      2017-03-20 04:26:24+00:00 UTC
+        Optionally provide publishing capability via
+        'publish_on_set' setting for Data::Chronicle::Writer
+
+
 0.13      2017-02-22 01:17:27+00:00 UTC
           fix dependency for Test::Mock::Redis
 
