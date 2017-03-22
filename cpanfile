@@ -1,4 +1,5 @@
 requires 'DBI';
+requires 'DBD::Pg';
 requires 'Date::Utility';
 requires 'JSON';
 requires 'Moose';
