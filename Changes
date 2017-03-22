@@ -2,6 +2,8 @@ Revision history for Data-Chronicle
 
 {{$NEXT}}
 
+0.15      2017-03-22 08:27:56+08:00 Asia/Shanghai
+
 0.14      2017-03-20 04:26:24+00:00 UTC
         Optionally provide publishing capability via
         'publish_on_set' setting for Data::Chronicle::Writer
