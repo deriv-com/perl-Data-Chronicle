@@ -128,7 +128,7 @@ sub set {
     my $value    = shift;
     my $rec_date = shift;
     my $archive  = shift // 1;
-    my $ttl      = shift // $self->$ttl;
+    my $ttl      = shift // $self->ttl;
 
     die "Recorded date is undefined" unless $rec_date;
     die "Recorded date is not a Date::Utility object" if ref $rec_date ne 'Date::Utility';
