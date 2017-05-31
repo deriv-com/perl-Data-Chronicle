@@ -168,7 +168,8 @@ sub _archive {
 
     my $db_timestamp = $rec_date->db_timestamp;
 
-    return $self->dbic->run(ping => sub {
+    return $self->dbic->run(
+        ping => sub {
             $_->prepare(<<'SQL')->execute($category, $name, $value, $db_timestamp) });
 WITH ups AS (
     UPDATE chronicle
