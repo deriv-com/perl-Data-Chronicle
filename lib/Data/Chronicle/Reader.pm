@@ -92,7 +92,7 @@ use Moose;
 
 =head2 cache_reader
 
-cahce_reader can be an object which has `get` method used to fetch data.
+cache_reader can be an object which has `get` method used to fetch data.
 or it can be a plain hash-ref.
 
 =cut
@@ -101,6 +101,12 @@ has 'cache_reader' => (
     is      => 'ro',
     default => undef,
 );
+
+=head2 dbic
+
+dbic should be an object of DBIx::Connector.
+
+=cut
 
 has 'dbic' => (
     isa     => 'Maybe[DBIx::Connector]',
