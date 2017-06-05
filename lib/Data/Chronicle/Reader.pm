@@ -155,7 +155,7 @@ sub get_for {
     die "Requesting for historical data without a valid DB connection [$category,$name,$date_for]" if not defined $self->dbic;
 
     my $db_data = $self->dbic->run(
-        ping => sub {
+        fixup => sub {
             $_->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
                 'id', {}, $category, $name, $db_timestamp);
         });
@@ -187,7 +187,7 @@ sub get_for_period {
     die "Requesting for historical period data without a valid DB connection [$category,$name]" if not defined $self->dbic;
 
     my $db_data = $self->dbic->run(
-        ping => sub {
+        fixup => sub {
             $_->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? AND timestamp >=? order by timestamp desc},
                 'id', {}, $category, $name, $end_timestamp, $start_timestamp);
         });
