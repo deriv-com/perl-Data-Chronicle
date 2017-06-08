@@ -65,11 +65,11 @@ Given a category, name and timestamp returns version of data under "category::na
 
  my $chronicle_w = Data::Chronicle::Writer->new(
     cache_writer => $writer,
-    db_handle    => $dbh);
+    dbic         => $dbic);
 
  my $chronicle_r = Data::Chronicle::Reader->new(
     cache_reader => $reader,
-    db_handle    => $dbh);
+    dbic         => $dbic);
 
  my $chronicle_r2 = Data::Chronicle::Reader->new(
     cache_reader => $hash_ref);
@@ -92,12 +92,24 @@ use Moose;
 
 =head2 cache_reader
 
-cahce_reader can be an object which has `get` method used to fetch data.
+cache_reader can be an object which has `get` method used to fetch data.
 or it can be a plain hash-ref.
 
 =cut
 
-has [qw(cache_reader db_handle)] => (
+has 'cache_reader' => (
+    is      => 'ro',
+    default => undef,
+);
+
+=head2 dbic
+
+dbic should be an object of DBIx::Connector.
+
+=cut
+
+has 'dbic' => (
+    isa     => 'Maybe[DBIx::Connector]',
     is      => 'ro',
     default => undef,
 );
@@ -114,9 +126,9 @@ sub get {
     my $category = shift;
     my $name     = shift;
 
-    my $key      = $category . '::' . $name;
+    my $key = $category . '::' . $name;
 
-    if ( blessed($self->cache_reader) ) {
+    if (blessed($self->cache_reader)) {
         my $cached_data = $self->cache_reader->get($key);
         return JSON::from_json($cached_data) if defined $cached_data;
     } else {
@@ -140,11 +152,13 @@ sub get_for {
 
     my $db_timestamp = Date::Utility->new($date_for)->db_timestamp;
 
-    die "Requesting for historical data without a valid DB connection [$category,$name,$date_for]" if not defined $self->db_handle;
+    die "Requesting for historical data without a valid DB connection [$category,$name,$date_for]" if not defined $self->dbic;
 
-    my $db_data =
-        $self->db_handle->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
-        'id', {}, $category, $name, $db_timestamp);
+    my $db_data = $self->dbic->run(
+        fixup => sub {
+            $_->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
+                'id', {}, $category, $name, $db_timestamp);
+        });
 
     return if not %$db_data;
 
@@ -170,12 +184,13 @@ sub get_for_period {
     my $start_timestamp = Date::Utility->new($start)->db_timestamp;
     my $end_timestamp   = Date::Utility->new($end)->db_timestamp;
 
-    die "Requesting for historical period data without a valid DB connection [$category,$name]" if not defined $self->db_handle;
+    die "Requesting for historical period data without a valid DB connection [$category,$name]" if not defined $self->dbic;
 
-    my $db_data =
-        $self->db_handle->selectall_hashref(
-        q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? AND timestamp >=? order by timestamp desc},
-        'id', {}, $category, $name, $end_timestamp, $start_timestamp);
+    my $db_data = $self->dbic->run(
+        fixup => sub {
+            $_->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? AND timestamp >=? order by timestamp desc},
+                'id', {}, $category, $name, $end_timestamp, $start_timestamp);
+        });
 
     return if not %$db_data;
 

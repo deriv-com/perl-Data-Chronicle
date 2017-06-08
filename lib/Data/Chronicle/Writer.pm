@@ -45,12 +45,12 @@ to save data and another method to retrieve it. All the underlying complexities 
 
  my $chronicle_w = Data::Chronicle::Writer->new(
     cache_writer => $writer,
-    db_handle    => $dbh,
+    dbic         => $dbic,
     ttl          => 86400);
 
  my $chronicle_r = Data::Chronicle::Reader->new(
     cache_reader => $reader,
-    db_handle    => $dbh);
+    dbic         => $dbic);
 
 
  #store data into Chronicle - each time we call `set` it will also store
@@ -69,7 +69,13 @@ use JSON;
 use Date::Utility;
 use Moose;
 
-has [qw(cache_writer db_handle)] => (
+has 'cache_writer' => (
+    is      => 'ro',
+    default => undef,
+);
+
+has 'dbic' => (
+    isa     => 'Maybe[DBIx::Connector]',
     is      => 'ro',
     default => undef,
 );
@@ -148,7 +154,7 @@ sub set {
         $ttl ? ('EX' => $ttl) : ());
     $writer->exec;
 
-    $self->_archive($category, $name, $value, $rec_date) if $archive and $self->db_handle;
+    $self->_archive($category, $name, $value, $rec_date) if $archive and $self->dbic;
 
     return 1;
 }
@@ -162,7 +168,9 @@ sub _archive {
 
     my $db_timestamp = $rec_date->db_timestamp;
 
-    return $self->db_handle->prepare(<<'SQL')->execute($category, $name, $value, $db_timestamp);
+    return $self->dbic->run(
+        fixup => sub {
+            $_->prepare(<<'SQL')->execute($category, $name, $value, $db_timestamp) });
 WITH ups AS (
     UPDATE chronicle
        SET value=$3

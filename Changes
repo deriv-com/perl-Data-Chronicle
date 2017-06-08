@@ -1,6 +1,7 @@
 Revision history for Data-Chronicle
 
 {{$NEXT}}
+        Replace dbh with DBIx::Connector object
 
 0.16      2017-05-12 04:17:59+00:00 UTC
         Add TTL support for set()
