@@ -141,7 +141,7 @@ sub set {
     die "Cannot store undefined values in Chronicle!" unless defined $value;
     die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
 
-    $value = JSON::to_json($value);
+    $value = encode_json($value);
 
     my $key    = $category . '::' . $name;
     my $writer = $self->cache_writer;

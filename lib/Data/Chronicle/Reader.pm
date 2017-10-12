@@ -130,7 +130,7 @@ sub get {
 
     if (blessed($self->cache_reader)) {
         my $cached_data = $self->cache_reader->get($key);
-        return JSON::from_json($cached_data) if defined $cached_data;
+        return decode_json($cached_data) if defined $cached_data;
     } else {
         return $self->cache_reader->{$key};
     }
