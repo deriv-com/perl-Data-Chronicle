@@ -165,7 +165,7 @@ sub get_for {
     my $id_value = (sort keys %{$db_data})[0];
     my $db_value = $db_data->{$id_value}->{value};
 
-    return JSON::from_json($db_value);
+    return JSON::MaybeXS->new->decode($db_value);
 }
 
 =head3 C<< my $data = get_for_period("category1", "name1", 1447401505, 1447401900) >>
