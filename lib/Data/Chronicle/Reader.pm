@@ -4,6 +4,10 @@ use 5.014;
 use strict;
 use warnings;
 use Data::Chronicle;
+use Date::Utility;
+use Encode qw(decode_utf8);
+use JSON::MaybeXS;
+use Moose;
 
 =head1 NAME
 
@@ -86,10 +90,6 @@ Given a category, name and timestamp returns version of data under "category::na
 
 =cut
 
-use JSON;
-use Date::Utility;
-use Moose;
-
 =head2 cache_reader
 
 cache_reader can be an object which has `get` method used to fetch data.
@@ -130,7 +130,7 @@ sub get {
 
     if (blessed($self->cache_reader)) {
         my $cached_data = $self->cache_reader->get($key);
-        return JSON::from_json($cached_data) if defined $cached_data;
+        return JSON::MaybeXS->new->decode(decode_utf8($cached_data)) if defined $cached_data;
     } else {
         return $self->cache_reader->{$key};
     }
@@ -165,7 +165,7 @@ sub get_for {
     my $id_value = (sort keys %{$db_data})[0];
     my $db_value = $db_data->{$id_value}->{value};
 
-    return JSON::from_json($db_value);
+    return JSON::MaybeXS->new->decode($db_value);
 }
 
 =head3 C<< my $data = get_for_period("category1", "name1", 1447401505, 1447401900) >>

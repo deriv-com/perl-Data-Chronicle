@@ -5,6 +5,8 @@ use Test::More;
 use Test::Exception;
 use Data::Chronicle::Mock;
 use Date::Utility;
+use JSON::MaybeXS;
+use utf8;
 
 require Test::NoWarnings;
 
@@ -34,7 +36,7 @@ throws_ok {
 qr/Recorded date is not/, 'throws warning if recorded date is not Date::Utility object';
 is $chronicle_w->set("log", "syslog", $d, Date::Utility->new), 1, "data is stored without problem";
 is_deeply $chronicle_r->get("log", "syslog"), $d, "data retrieval works";
-is_deeply $chronicle_r->cache_reader->get("log::syslog"), JSON::to_json($d), "redis has stored correct data";
+is_deeply $chronicle_r->cache_reader->get("log::syslog"), JSON::MaybeXS->new->encode($d), "redis has stored correct data";
 
 is $chronicle_w->set("log", "syslog-old", $d_old, Date::Utility->new(0)), 1, "data is stored without problem when specifying recorded date";
 
@@ -55,16 +57,19 @@ my $d4 = $chronicle_r->get("log", "syslog");
 is_deeply $d3, $d4, "data retrieval works for the new version";
 
 my $hash_ref = {
-    'A::B' => 1,
-    'C::D' => 2,
+    'A::B'       => 1,
+    'C::D'       => 2,
     'Test::Data' => 0,
 };
+my $utf8_test = {'Ларри' => 'Уолл'};
+is $chronicle_w->set('utf8', 'test', $utf8_test, Date::Utility->new), 1, 'utf8 data stored';
+is_deeply $chronicle_r->get('utf8', 'test'), $utf8_test, 'utf8 data retrieved';
 
-$chronicle_r = Data::Chronicle::Reader->new({ cache_reader => $hash_ref });
+$chronicle_r = Data::Chronicle::Reader->new({cache_reader => $hash_ref});
 
-is $chronicle_r->get('A', 'B'), 1, 'correct data being read from memory mapped chronicle';
-is $chronicle_r->get('C', 'D'), 2, 'correct data being read from memory mapped chronicle';
-is $chronicle_r->get('Test', 'Data'), 0, 'correct data being read from memory mapped chronicle';
+is $chronicle_r->get('A',     'B'),    1,     'correct data being read from memory mapped chronicle';
+is $chronicle_r->get('C',     'D'),    2,     'correct data being read from memory mapped chronicle';
+is $chronicle_r->get('Test',  'Data'), 0,     'correct data being read from memory mapped chronicle';
 is $chronicle_r->get('Test1', 'Data'), undef, 'correct missing data being read from memory mapped chronicle';
 
 Test::NoWarnings::had_no_warnings();

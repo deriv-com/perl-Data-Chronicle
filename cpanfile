@@ -1,7 +1,7 @@
 requires 'DBIx::Connector';
 requires 'DBD::Pg';
 requires 'Date::Utility';
-requires 'JSON';
+requires 'JSON::MaybeXS';
 requires 'Moose';
 requires 'Test::PostgreSQL';
 requires 'Test::Mock::Redis';

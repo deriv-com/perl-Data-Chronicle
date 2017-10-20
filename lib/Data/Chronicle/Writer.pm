@@ -4,6 +4,10 @@ use 5.014;
 use strict;
 use warnings;
 use Data::Chronicle;
+use Date::Utility;
+use Encode qw(encode_utf8);
+use JSON::MaybeXS;
+use Moose;
 
 =head1 NAME
 
@@ -64,10 +68,6 @@ to save data and another method to retrieve it. All the underlying complexities 
  my $some_old_data = $chronicle_r->get_for("log_files", "syslog", $epoch1);
 
 =cut
-
-use JSON;
-use Date::Utility;
-use Moose;
 
 has 'cache_writer' => (
     is      => 'ro',
@@ -141,16 +141,17 @@ sub set {
     die "Cannot store undefined values in Chronicle!" unless defined $value;
     die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
 
-    $value = JSON::to_json($value);
+    $value = JSON::MaybeXS->new->encode($value);
 
     my $key    = $category . '::' . $name;
     my $writer = $self->cache_writer;
 
     # publish & set in transaction
     $writer->multi;
-    $writer->publish($key, $value) if $self->publish_on_set;
+    my $encoded = encode_utf8($value);
+    $writer->publish($key, $encoded) if $self->publish_on_set;
     $writer->set(
-        $key => $value,
+        $key => $encoded,
         $ttl ? ('EX' => $ttl) : ());
     $writer->exec;
 
