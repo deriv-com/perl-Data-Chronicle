@@ -199,7 +199,7 @@ sub get_for_period {
     for my $id_value (keys %$db_data) {
         my $db_value = $db_data->{$id_value}->{value};
 
-        push @result, JSON::from_json($db_value);
+        push @result, JSON::MaybeXS->new->decode($db_value);
     }
 
     return \@result;
