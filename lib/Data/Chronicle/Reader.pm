@@ -217,6 +217,7 @@ sub get_history {
     my $name     = shift;
     my $rev      = shift;
 
+    die "Revision must be >= 0" if $rev < 0;
     die "Requesting for historical data without a valid DB connection [$category,$name,$rev]" if not defined $self->dbic;
 
     my $db_data = $self->dbic->run(
