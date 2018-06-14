@@ -43,6 +43,19 @@ is $chronicle_w->set("log", "syslog-old", $d_old, Date::Utility->new(0)), 1, "da
 my $old_data = $chronicle_r->get_for("log", "syslog-old", 0);
 is_deeply $old_data, $d_old, "data stored using recorded_date is retrieved successfully";
 
+$chronicle_w->set("testcat", "testname", ['value1'], Date::Utility->new);
+sleep 1;
+$chronicle_w->set("testcat", "testname", ['value2'], Date::Utility->new);
+sleep 1;
+$chronicle_w->set("testcat", "testname", ['value3'], Date::Utility->new);
+sleep 1;
+$chronicle_w->set("testcat", "testname", ['value4'], Date::Utility->new);
+is_deeply ['value4'], $chronicle_r->get_history("testcat", "testname", 0), 'Revision is retrieved successfully';
+is_deeply ['value3'], $chronicle_r->get_history("testcat", "testname", 1), 'Revision is retrieved successfully';
+is_deeply ['value2'], $chronicle_r->get_history("testcat", "testname", 2), 'Revision is retrieved successfully';
+is_deeply ['value1'], $chronicle_r->get_history("testcat", "testname", 3), 'Revision is retrieved successfully';
+is_deeply ['value1'], $chronicle_r->get_history("testcat", "testname", 4), 'Revision is retrieved successfully';
+
 my $d2 = $chronicle_r->get("log", "syslog");
 is_deeply $d, $d2, "data retrieval works";
 

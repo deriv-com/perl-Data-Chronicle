@@ -39,6 +39,12 @@ Given a category, name and timestamp returns version of data under "category::na
 * **get_for_period** (in Data::Chronicle::Reader):
 Given a category, name, start_timestamp and end_timestamp returns an array-ref containing all data stored between given period for the given "category::name" (using a DB lookup).
 
+* **get_history** (in Data::Chronicle::Reader):
+Given a category, name, and revision returns version of the data the specificied number of revisions in the past.
+If revision 0 is chosen, the latest verson of the data will be returned.
+If revision 1 is chosen, the previous version of the data will be returned.
+If the chosen revision exceeds the number of versions in the history, then the oldest version will be returned.
+
 ## Examples ##
 
 ```

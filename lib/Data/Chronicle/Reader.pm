@@ -205,6 +205,34 @@ sub get_for_period {
     return \@result;
 }
 
+=head3 C<< my $data = get_history("category1", "name1", 1) >>
+
+Query Pg archive for the data under "category1::name1" at the provided number of revisions in the past.
+
+=cut
+
+sub get_history {
+    my $self     = shift;
+    my $category = shift;
+    my $name     = shift;
+    my $rev      = shift;
+
+    die "Requesting for historical data without a valid DB connection [$category,$name,$rev]" if not defined $self->dbic;
+
+    my $db_data = $self->dbic->run(
+        fixup => sub {
+            $_->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? order by timestamp desc limit ?},
+                'id', {}, $category, $name, $rev+1);
+        });
+
+    return if not %$db_data;
+
+    my $id_value = (sort keys %{$db_data})[0];
+    my $db_value = $db_data->{$id_value}->{value};
+
+    return JSON::MaybeXS->new->decode($db_value);
+}
+
 no Moose;
 
 =head1 AUTHOR
