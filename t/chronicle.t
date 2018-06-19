@@ -54,7 +54,7 @@ is_deeply ['value4'], $chronicle_r->get_history("testcat", "testname", 0), 'Revi
 is_deeply ['value3'], $chronicle_r->get_history("testcat", "testname", 1), 'Revision is retrieved successfully';
 is_deeply ['value2'], $chronicle_r->get_history("testcat", "testname", 2), 'Revision is retrieved successfully';
 is_deeply ['value1'], $chronicle_r->get_history("testcat", "testname", 3), 'Revision is retrieved successfully';
-is_deeply ['value1'], $chronicle_r->get_history("testcat", "testname", 4), 'Revision is retrieved successfully';
+is undef, $chronicle_r->get_history("testcat", "testname", 4), 'Revision is retrieved successfully';
 
 my $d2 = $chronicle_r->get("log", "syslog");
 is_deeply $d, $d2, "data retrieval works";

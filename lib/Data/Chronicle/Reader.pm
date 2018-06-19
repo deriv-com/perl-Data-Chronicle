@@ -217,13 +217,13 @@ sub get_history {
     my $name     = shift;
     my $rev      = shift;
 
-    die "Revision must be >= 0" if (!defined $rev || $rev < 0);
+    die "Revision must be >= 0" unless (defined $rev && $rev >= 0);
     die "Requesting for historical data without a valid DB connection [$category,$name,$rev]" if not defined $self->dbic;
 
     my $db_data = $self->dbic->run(
         fixup => sub {
-            $_->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? order by timestamp desc limit ?},
-                'id', {}, $category, $name, $rev+1);
+            $_->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? order by timestamp desc limit 1 offset ?},
+                'id', {}, $category, $name, $rev);
         });
 
     return if not %$db_data;
