@@ -2,7 +2,7 @@ package Data::Chronicle::Mock;
 
 =head1 NAME
 
-Data::Chronicle::Mock - Mokcing utility to test chronicle based scenarios
+Data::Chronicle::Mock - Mocking utility to test chronicle based scenarios
 
 =cut
 
