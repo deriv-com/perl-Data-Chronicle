@@ -136,28 +136,67 @@ sub set {
     my $archive  = shift // 1;
     my $ttl      = shift // $self->ttl;
 
-    die "Recorded date is undefined" unless $rec_date;
-    die "Recorded date is not a Date::Utility object" if ref $rec_date ne 'Date::Utility';
-    die "Cannot store undefined values in Chronicle!" unless defined $value;
-    die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
+    $self->mset([[$category, $name, $value]], $rec_date, $archive, $ttl);
 
-    $value = JSON::MaybeXS->new->encode($value);
+    return 1;
+}
 
-    my $key    = $category . '::' . $name;
+=head2 mset
+
+Example:
+
+    $chronicle_writer->mset([["category1", "name1", $value1], ["category2, "name2", $value2], ...]);
+
+Store a piece of data "value1" under key "category1::name1", etc in Pg and Redis. Will
+publish "category1::name1", etc in Redis if C<publish_on_set> is true.
+
+=cut
+
+sub mset {
+    my $self     = shift;
+    my $entries  = shift;
+    my $rec_date = shift;
+    my $archive  = shift // 1;
+    my $ttl      = shift // $self->ttl;
+
+    $self->_validate_value($_->[2]) foreach @$entries;
+    $self->_validate_rec_date($rec_date);
+
     my $writer = $self->cache_writer;
 
     # publish & set in transaction
     $writer->multi;
-    my $encoded = encode_utf8($value);
-    $writer->publish($key, $encoded) if $self->publish_on_set;
-    $writer->set(
-        $key => $encoded,
-        $ttl ? ('EX' => $ttl) : ());
+    foreach my $entry (@$entries) {
+        my $category = $entry->[0];
+        my $name     = $entry->[1];
+        my $value    = $entry->[2];
+
+        my $key = $category . '::' . $name;
+        $value = JSON::MaybeXS->new->encode($value);
+
+        my $encoded = encode_utf8($value);
+        $writer->publish($key, $encoded) if $self->publish_on_set;
+        $writer->set(
+            $key => $encoded,
+            $ttl ? ('EX' => $ttl) : ());
+
+        $self->_archive($category, $name, $value, $rec_date) if $archive and $self->dbic;
+    }
     $writer->exec;
 
-    $self->_archive($category, $name, $value, $rec_date) if $archive and $self->dbic;
-
     return 1;
+}
+
+sub _validate_value {
+    my ($self, $value) = @_;
+    die "Cannot store undefined values in Chronicle!" unless defined $value;
+    die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
+}
+
+sub _validate_rec_date {
+    my ($self, $rec_date) = @_;
+    die "Recorded date is undefined" unless $rec_date;
+    die "Recorded date is not a Date::Utility object" if ref $rec_date ne 'Date::Utility';
 }
 
 sub _archive {

@@ -126,13 +126,30 @@ sub get {
     my $category = shift;
     my $name     = shift;
 
-    my $key = $category . '::' . $name;
+    my @cached_data = $self->mget([[$category, $name]]);
+    return $cached_data[0] if @cached_data;
+
+    return undef;
+}
+
+=head3 C<< my $data = mget([["category1", "name1"], ["category2", "name2"], ...]) >>
+
+Query for the latest data under "category1::name1", "category2::name2", etc from the cache reader.
+Will return an arrayref containing results in the same ordering, with `undef` if the data does not exist.
+
+=cut
+
+sub mget {
+    my $self  = shift;
+    my $pairs = shift;
+
+    my @keys = map { $_->[0] . '::' . $_->[1] } @$pairs;
 
     if (blessed($self->cache_reader)) {
-        my $cached_data = $self->cache_reader->get($key);
-        return JSON::MaybeXS->new->decode(decode_utf8($cached_data)) if defined $cached_data;
+        my @cached_data = $self->cache_reader->mget(@keys);
+        return map { JSON::MaybeXS->new->decode(decode_utf8($_)) if $_ } @cached_data;
     } else {
-        return $self->cache_reader->{$key};
+        return map { $self->cache_reader->{$_} } @keys;
     }
 
     return undef;
