@@ -191,12 +191,14 @@ sub _validate_value {
     my ($self, $value) = @_;
     die "Cannot store undefined values in Chronicle!" unless defined $value;
     die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
+    return;
 }
 
 sub _validate_rec_date {
     my ($self, $rec_date) = @_;
     die "Recorded date is undefined" unless $rec_date;
     die "Recorded date is not a Date::Utility object" if ref $rec_date ne 'Date::Utility';
+    return;
 }
 
 sub _archive {
