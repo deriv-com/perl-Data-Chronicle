@@ -134,9 +134,10 @@ sub set {
     my $value    = shift;
     my $rec_date = shift;
     my $archive  = shift // 1;
+    my $suppress_pub = shift // 0;
     my $ttl      = shift // $self->ttl;
 
-    $self->mset([[$category, $name, $value]], $rec_date, $archive, $ttl);
+    $self->mset([[$category, $name, $value]], $rec_date, $archive, $suppress_pub, $ttl);
 
     return 1;
 }
@@ -157,6 +158,7 @@ sub mset {
     my $entries  = shift;
     my $rec_date = shift;
     my $archive  = shift // 1;
+    my $suppress_pub = shift // 0;
     my $ttl      = shift // $self->ttl;
 
     $self->_validate_value($_->[2]) foreach @$entries;
@@ -175,7 +177,7 @@ sub mset {
         $value = JSON::MaybeXS->new->encode($value);
 
         my $encoded = encode_utf8($value);
-        $writer->publish($key, $encoded) if $self->publish_on_set;
+        $writer->publish($key, $encoded) if $self->publish_on_set && !$suppress_pub;
         $writer->set(
             $key => $encoded,
             $ttl ? ('EX' => $ttl) : ());
