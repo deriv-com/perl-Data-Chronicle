@@ -222,13 +222,11 @@ sub setnx {
     $value = JSON::MaybeXS->new->encode($value);
 
     my $encoded = encode_utf8($value);
-    #$writer->publish($key, $encoded) if $self->publish_on_set && !$suppress_pub;
     $writer->setnx(
         $key => $encoded,
         $ttl ? ('EX' => $ttl) : ());
 
     $writer->exec;
-    #$self->_archive($category, $name, $value, $rec_date) if $archive and $self->dbic;
 
     return 1;
 }
