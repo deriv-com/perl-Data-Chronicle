@@ -72,6 +72,13 @@ subtest 'Set and get items atomically' => sub {
     };
 };
 
+subtest 'Set if not exist' => sub {
+    ok $chronicle_w->setnx("testcat", "testname2", ["SetThis"], Date::Utility->new);
+    is_deeply $chronicle_r->get("testcat", "testname2"), ["SetThis"], 'Settting of non-existent key works';
+    ok $chronicle_w->setnx("testcat", "testname2", ["NotThis"], Date::Utility->new);
+    is_deeply $chronicle_r->get("testcat", "testname2"), ["SetThis"], "Key hasn't changed";
+};
+
 my $d2 = $chronicle_r->get("log", "syslog");
 is_deeply $d, $d2, "data retrieval works";
 
