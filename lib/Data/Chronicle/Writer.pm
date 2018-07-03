@@ -189,6 +189,50 @@ sub mset {
     return 1;
 }
 
+=head2 setnx
+
+Example:
+
+    $chronicle_writer->setnx("category1", "name1", $value1);
+
+Store a piece of data "value1" under key "category1::name1" in Pg and Redis if key does not exist.
+Will publish "category1::name1" in Redis if C<publish_on_set> is true.
+
+=cut
+
+sub setnx {
+    my $self     = shift;
+    my $category = shift;
+    my $name     = shift;
+    my $value    = shift;
+    my $rec_date = shift;
+    my $archive  = shift // 1;
+    my $suppress_pub = shift // 0;
+    my $ttl      = shift // $self->ttl;
+
+    $self->_validate_value($value);
+    $self->_validate_rec_date($rec_date);
+
+    my $writer = $self->cache_writer;
+
+    # publish & set in transaction
+    $writer->multi;
+
+    my $key = $self->_generate_key($category, $name);
+    $value = JSON::MaybeXS->new->encode($value);
+
+    my $encoded = encode_utf8($value);
+    #$writer->publish($key, $encoded) if $self->publish_on_set && !$suppress_pub;
+    $writer->setnx(
+        $key => $encoded,
+        $ttl ? ('EX' => $ttl) : ());
+
+    $writer->exec;
+    #$self->_archive($category, $name, $value, $rec_date) if $archive and $self->dbic;
+
+    return 1;
+}
+
 =head2 subscribe
 
 Example:
