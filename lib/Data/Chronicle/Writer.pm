@@ -206,8 +206,6 @@ sub setnx {
     my $name         = shift;
     my $value        = shift;
     my $rec_date     = shift;
-    my $archive      = shift // 1;
-    my $suppress_pub = shift // 0;
     my $ttl          = shift // $self->ttl;
 
     $self->_validate_value($value);
