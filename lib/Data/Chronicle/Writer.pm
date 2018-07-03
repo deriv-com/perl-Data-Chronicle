@@ -203,7 +203,7 @@ sub subscribe {
     die 'Subscription requires a coderef' if ref $subref ne 'CODE';
 
     my $key = $self->_generate_key($category, $name);
-    $self->cache_writer->subscribe($key, $subref);
+    return $self->cache_writer->subscribe($key, $subref);
 }
 
 =head2 unsubscribe
@@ -220,7 +220,7 @@ sub unsubscribe {
     die 'Unsubscription requires a coderef' if ref $subref ne 'CODE';
 
     my $key = $self->_generate_key($category, $name);
-    $self->cache_writer->unsubscribe($key, $subref);
+    return $self->cache_writer->unsubscribe($key, $subref);
 }
 
 sub _generate_key {
