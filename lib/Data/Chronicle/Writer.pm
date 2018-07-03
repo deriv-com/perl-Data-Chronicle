@@ -173,7 +173,7 @@ sub mset {
         my $name     = $entry->[1];
         my $value    = $entry->[2];
 
-        my $key = $category . '::' . $name;
+        my $key = $self->_generate_key($category, $name);
         $value = JSON::MaybeXS->new->encode($value);
 
         my $encoded = encode_utf8($value);
@@ -187,6 +187,45 @@ sub mset {
     $writer->exec;
 
     return 1;
+}
+
+=head2 subscribe
+
+Example:
+
+    $chronicle_writer->subscribe("category1", "name1", $code_ref);
+
+=cut
+
+sub subscribe {
+    my ($self, $category, $name, $subref) = @_;
+    die 'publish_on_set must be enabled to subscribe' unless $self->publish_on_set;
+    die 'Subscription requires a coderef' if ref $subref ne 'CODE';
+
+    my $key = $self->_generate_key($category, $name);
+    $self->cache_writer->subscribe($key, $subref);
+}
+
+=head2 unsubscribe
+
+Example:
+
+    $chronicle_writer->unsubscribe("category1", "name1", $code_ref);
+
+=cut
+
+sub unsubscribe {
+    my ($self, $category, $name, $subref) = @_;
+    die 'publish_on_set must be enabled to unsubscribe' unless $self->publish_on_set;
+    die 'Unsubscription requires a coderef' if ref $subref ne 'CODE';
+
+    my $key = $self->_generate_key($category, $name);
+    $self->cache_writer->unsubscribe($key, $subref);
+}
+
+sub _generate_key {
+    my ($self, $category, $name) = @_;
+    return $category . '::' . $name;
 }
 
 sub _validate_value {
