@@ -128,14 +128,14 @@ publish "category1::name1" in Redis if C<publish_on_set> is true.
 =cut
 
 sub set {
-    my $self     = shift;
-    my $category = shift;
-    my $name     = shift;
-    my $value    = shift;
-    my $rec_date = shift;
-    my $archive  = shift // 1;
+    my $self         = shift;
+    my $category     = shift;
+    my $name         = shift;
+    my $value        = shift;
+    my $rec_date     = shift;
+    my $archive      = shift // 1;
     my $suppress_pub = shift // 0;
-    my $ttl      = shift // $self->ttl;
+    my $ttl          = shift // $self->ttl;
 
     $self->mset([[$category, $name, $value]], $rec_date, $archive, $suppress_pub, $ttl);
 
@@ -154,12 +154,12 @@ publish "category1::name1", etc in Redis if C<publish_on_set> is true.
 =cut
 
 sub mset {
-    my $self     = shift;
-    my $entries  = shift;
-    my $rec_date = shift;
-    my $archive  = shift // 1;
+    my $self         = shift;
+    my $entries      = shift;
+    my $rec_date     = shift;
+    my $archive      = shift // 1;
     my $suppress_pub = shift // 0;
-    my $ttl      = shift // $self->ttl;
+    my $ttl          = shift // $self->ttl;
 
     $self->_validate_value($_->[2]) foreach @$entries;
     $self->_validate_rec_date($rec_date);
@@ -201,14 +201,14 @@ Will publish "category1::name1" in Redis if C<publish_on_set> is true.
 =cut
 
 sub setnx {
-    my $self     = shift;
-    my $category = shift;
-    my $name     = shift;
-    my $value    = shift;
-    my $rec_date = shift;
-    my $archive  = shift // 1;
+    my $self         = shift;
+    my $category     = shift;
+    my $name         = shift;
+    my $value        = shift;
+    my $rec_date     = shift;
+    my $archive      = shift // 1;
     my $suppress_pub = shift // 0;
-    my $ttl      = shift // $self->ttl;
+    my $ttl          = shift // $self->ttl;
 
     $self->_validate_value($value);
     $self->_validate_rec_date($rec_date);
