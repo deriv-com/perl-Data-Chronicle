@@ -196,7 +196,7 @@ Example:
     $chronicle_writer->setnx("category1", "name1", $value1);
 
 Store a piece of data "value1" under key "category1::name1" in Pg and Redis if key does not exist.
-Will publish "category1::name1" in Redis if C<publish_on_set> is true.
+Setnx does not support archiving or publish_on_set.
 
 =cut
 
