@@ -5,8 +5,7 @@ use strict;
 use warnings;
 use Data::Chronicle;
 use Date::Utility;
-use Encode qw(encode_utf8);
-use JSON::MaybeXS;
+use JSON::MaybeUTF8 qw(encode_json_utf8);
 use Moose;
 
 =head1 NAME
@@ -174,15 +173,14 @@ sub mset {
         my $value    = $entry->[2];
 
         my $key = $self->_generate_key($category, $name);
-        $value = JSON::MaybeXS->new->encode($value);
 
-        my $encoded = encode_utf8($value);
+        my $encoded = encode_json_utf8($value);
         $writer->publish($key, $encoded) if $self->publish_on_set && !$suppress_pub;
         $writer->set(
             $key => $encoded,
             $ttl ? ('EX' => $ttl) : ());
 
-        $self->_archive($category, $name, $value, $rec_date) if $archive and $self->dbic;
+        $self->_archive($category, $name, $encoded, $rec_date) if $archive and $self->dbic;
     }
     $writer->exec;
 

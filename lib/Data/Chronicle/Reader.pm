@@ -5,8 +5,7 @@ use strict;
 use warnings;
 use Data::Chronicle;
 use Date::Utility;
-use Encode qw(decode_utf8);
-use JSON::MaybeXS;
+use JSON::MaybeUTF8 qw(decode_json_utf8);
 use Moose;
 
 =head1 NAME
@@ -147,7 +146,7 @@ sub mget {
 
     if (blessed($self->cache_reader)) {
         my @cached_data = $self->cache_reader->mget(@keys);
-        return map { JSON::MaybeXS->new->decode(decode_utf8($_)) if $_ } @cached_data;
+        return map { decode_json_utf8($_) if $_ } @cached_data;
     } else {
         return map { $self->cache_reader->{$_} } @keys;
     }
@@ -182,7 +181,7 @@ sub get_for {
     my $id_value = (sort keys %{$db_data})[0];
     my $db_value = $db_data->{$id_value}->{value};
 
-    return JSON::MaybeXS->new->decode($db_value);
+    return decode_json_utf8($db_value);
 }
 
 =head3 C<< my $data = get_for_period("category1", "name1", 1447401505, 1447401900) >>
@@ -216,7 +215,7 @@ sub get_for_period {
     for my $id_value (keys %$db_data) {
         my $db_value = $db_data->{$id_value}->{value};
 
-        push @result, JSON::MaybeXS->new->decode($db_value);
+        push @result, decode_json_utf8($db_value);
     }
 
     return \@result;
@@ -248,7 +247,7 @@ sub get_history {
     my $id_value = (sort keys %{$db_data})[0];
     my $db_value = $db_data->{$id_value}->{value};
 
-    return JSON::MaybeXS->new->decode($db_value);
+    return decode_json_utf8($db_value);
 }
 
 no Moose;
