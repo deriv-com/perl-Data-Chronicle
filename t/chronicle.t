@@ -5,7 +5,7 @@ use Test::More;
 use Test::Exception;
 use Data::Chronicle::Mock;
 use Date::Utility;
-use JSON::MaybeXS;
+use JSON::MaybeUTF8 qw(encode_json_utf8);
 use utf8;
 
 require Test::NoWarnings;
@@ -36,7 +36,7 @@ throws_ok {
 qr/Recorded date is not/, 'throws warning if recorded date is not Date::Utility object';
 is $chronicle_w->set("log", "syslog", $d, Date::Utility->new), 1, "data is stored without problem";
 is_deeply $chronicle_r->get("log", "syslog"), $d, "data retrieval works";
-is_deeply $chronicle_r->cache_reader->get("log::syslog"), JSON::MaybeXS->new->encode($d), "redis has stored correct data";
+is_deeply $chronicle_r->cache_reader->get("log::syslog"), encode_json_utf8($d), "redis has stored correct data";
 
 is $chronicle_w->set("log", "syslog-old", $d_old, Date::Utility->new(0)), 1, "data is stored without problem when specifying recorded date";
 
