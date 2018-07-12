@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Data::Chronicle",
   "PREREQ_PM" => {
     "DBD::Pg" => 0,
-    "DBI" => 0,
+    "DBIx::Connector" => 0,
     "Date::Utility" => 0,
     "JSON::MaybeUTF8" => 0,
     "Moose" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.94",
     "Test::NoWarnings" => 0
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.17",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBD::Pg" => 0,
-  "DBI" => 0,
+  "DBIx::Connector" => 0,
   "Date::Utility" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
