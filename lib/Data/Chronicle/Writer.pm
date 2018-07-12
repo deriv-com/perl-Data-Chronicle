@@ -147,8 +147,8 @@ Example:
 
     $chronicle_writer->mset([["category1", "name1", $value1], ["category2, "name2", $value2], ...]);
 
-Store a piece of data "value1" under key "category1::name1", etc in Pg and Redis. Will
-publish "category1::name1", etc in Redis if C<publish_on_set> is true.
+Store a piece of data "value1" under key "category1::name1", "category2::name2", etc in Pg and Redis. Will
+publish "category1::name1", "category2::name2", etc in Redis if C<publish_on_set> is true.
 
 =cut
 
