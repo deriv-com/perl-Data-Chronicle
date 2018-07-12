@@ -1,9 +1,7 @@
 Revision history for Data-Chronicle
 
 {{$NEXT}}
-        Replace dbh with DBIx::Connector object
-
-0.17      July 12, 2018
+        Replaced dbh with DBIx::Connector object
         Added mget and mset methods
         Added get_history method
         Added subscribe and unsubscribe methods
