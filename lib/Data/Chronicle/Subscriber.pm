@@ -68,7 +68,14 @@ to save data and another method to retrieve it. All the underlying complexities 
 
 =cut
 
+=head2 cache_subscriber
+
+cache_subscriber should be an object of RedisDB.
+
+=cut
+
 has 'cache_subscriber' => (
+    isa     => 'RedisDB',
     is      => 'ro',
     default => undef,
 );

@@ -68,10 +68,23 @@ to save data and another method to retrieve it. All the underlying complexities 
 
 =cut
 
+=head2 cache_writer
+
+cache_writer should be an object of RedisDB.
+
+=cut
+
 has 'cache_writer' => (
+    isa     => 'RedisDB',
     is      => 'ro',
     default => undef,
 );
+
+=head2 dbic
+
+dbic should be an object of DBIx::Connector.
+
+=cut
 
 has 'dbic' => (
     isa     => 'Maybe[DBIx::Connector]',

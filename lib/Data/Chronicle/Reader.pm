@@ -91,12 +91,12 @@ Given a category, name and timestamp returns version of data under "category::na
 
 =head2 cache_reader
 
-cache_reader can be an object which has `get` method used to fetch data.
-or it can be a plain hash-ref.
+cache_reader should be an object of RedisDB.
 
 =cut
 
 has 'cache_reader' => (
+    isa     => 'RedisDB',
     is      => 'ro',
     default => undef,
 );
@@ -144,14 +144,8 @@ sub mget {
 
     my @keys = map { $_->[0] . '::' . $_->[1] } @$pairs;
 
-    if (blessed($self->cache_reader)) {
-        my @cached_data = $self->cache_reader->mget(@keys);
-        return map { decode_json_utf8($_) if $_ } @cached_data;
-    } else {
-        return map { $self->cache_reader->{$_} } @keys;
-    }
-
-    return undef;
+    my @cached_data = $self->cache_reader->mget(@keys);
+    return map { decode_json_utf8($_) if $_ } @cached_data;
 }
 
 =head3 C<< my $data = get_for("category1", "name1", 1447401505) >>
