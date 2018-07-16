@@ -3,6 +3,7 @@ Revision history for Data-Chronicle
 {{$NEXT}}
         Created new Subscriber package so a separate connection can be used for this functionality
         Removed partially implemented functionality to use Perl hash instead of Redis
+        Updated documentation and made style consistent
 
 0.17      2018-07-12 18:17:13+08:00 Asia/Manila
         - Replace dbh with DBIx::Connector object
