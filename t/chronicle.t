@@ -85,21 +85,29 @@ is $chronicle_w->set("log", "syslog", $d3, Date::Utility->new), 1, "new version 
 my $d4 = $chronicle_r->get("log", "syslog");
 is_deeply $d3, $d4, "data retrieval works for the new version";
 
-my $hash_ref = {
-    'A::B'       => 1,
-    'C::D'       => 2,
-    'Test::Data' => 0,
-};
 my $utf8_test = {'Ларри' => 'Уолл'};
 is $chronicle_w->set('utf8', 'test', $utf8_test, Date::Utility->new), 1, 'utf8 data stored';
 is_deeply $chronicle_r->get('utf8', 'test'), $utf8_test, 'utf8 data retrieved';
 
-$chronicle_r = Data::Chronicle::Reader->new({cache_reader => $hash_ref});
+subtest 'Hash ref as chronicle' => sub {
+    my $hash_ref = {
+        'A::B'       => [1],
+        'C::D'       => [2],
+        'Test::Data' => [0],
+    };
 
-is $chronicle_r->get('A',     'B'),    1,     'correct data being read from memory mapped chronicle';
-is $chronicle_r->get('C',     'D'),    2,     'correct data being read from memory mapped chronicle';
-is $chronicle_r->get('Test',  'Data'), 0,     'correct data being read from memory mapped chronicle';
-is $chronicle_r->get('Test1', 'Data'), undef, 'correct missing data being read from memory mapped chronicle';
+    $chronicle_r = Data::Chronicle::Reader->new({cache_reader => $hash_ref});
+    $chronicle_w = Data::Chronicle::Writer->new({cache_writer => $hash_ref});
+
+    is_deeply $chronicle_r->get('A',    'B'),    [1], 'correct data being read from memory mapped chronicle';
+    is_deeply $chronicle_r->get('C',    'D'),    [2], 'correct data being read from memory mapped chronicle';
+    is_deeply $chronicle_r->get('Test', 'Data'), [0], 'correct data being read from memory mapped chronicle';
+    is_deeply $chronicle_r->get('Test1', 'Data'), undef, 'correct missing data being read from memory mapped chronicle';
+
+    $chronicle_w->mset([['Test', 'Data2', ['ZZ']], ['Test', 'Data3', ['XX']]], Date::Utility->new);
+    my @result = $chronicle_r->mget([['Test', 'Data2'], ['Test', 'Data'], ['Test', 'Data3']]);
+    is_deeply \@result, [['ZZ'], [0], ['XX']];
+};
 
 Test::NoWarnings::had_no_warnings();
 done_testing();

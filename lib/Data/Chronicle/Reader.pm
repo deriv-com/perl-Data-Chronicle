@@ -96,9 +96,8 @@ cache_reader should be an object of RedisDB.
 =cut
 
 has 'cache_reader' => (
-    isa     => 'RedisDB',
     is      => 'ro',
-    default => undef,
+    default => sub { {} },
 );
 
 =head2 dbic
@@ -144,8 +143,18 @@ sub mget {
 
     my @keys = map { $_->[0] . '::' . $_->[1] } @$pairs;
 
-    my @cached_data = $self->cache_reader->mget(@keys);
-    return map { decode_json_utf8($_) if $_ } @cached_data;
+    my $reader = $self->cache_reader;
+    my $reader_type =
+          blessed($self->cache_reader)       ? 'redis'
+        : ref($self->cache_reader) eq 'HASH' ? 'hash'
+        :                                      die 'Unsupported cache_reader type';
+
+    if ($reader_type eq 'redis') {
+        my @cached_data = $self->cache_reader->mget(@keys);
+        return map { decode_json_utf8($_) if $_ } @cached_data;
+    } elsif ($reader_type eq 'hash') {
+        return map { $self->cache_reader->{$_} } @keys;
+    }
 }
 
 =head3 C<< my $data = get_for("category1", "name1", 1447401505) >>

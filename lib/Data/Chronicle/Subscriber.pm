@@ -75,7 +75,6 @@ cache_subscriber should be an object of RedisDB.
 =cut
 
 has 'cache_subscriber' => (
-    isa     => 'RedisDB',
     is      => 'ro',
     default => undef,
 );
@@ -107,7 +106,7 @@ Example:
 =cut
 
 sub unsubscribe {
-    my ($self, $category, $name, $subref) = @_;
+    my ($self, $category, $name) = @_;
 
     my $key = $self->_generate_key($category, $name);
     return $self->cache_subscriber->unsubscribe($key);
