@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/binary-com/perl-Data-Chronicle.svg?branch=master)](https://travis-ci.org/binary-com/perl-Data-Chronicle)
 [![codecov](https://codecov.io/gh/binary-com/perl-Data-Chronicle/branch/master/graph/badge.svg)](https://codecov.io/gh/binary-com/perl-Data-Chronicle)
 
-This repository contains two modules (Reader and Writer) which can be used to store and retrieve information
+This repository contains three modules (Reader, Writer, and Subscriber) which can be used to store and retrieve information
 on an efficient storage with below properties:
  
 * **Timeliness**
@@ -23,7 +23,7 @@ Note that you will need to pass `cache_writer`, `cache_reader` and `db_handle` t
 
 `cache_writer` and `cache_reader` should be to be able to get/set given data under given key (both of type string). `db_handle` should be capable to store and retrieve data with `category`,`name` in addition to the timestamp of data insertion. So it should be able to retrieve data for a specific timestamp, category and name. Category, name and data are all string. This can easily be achieved by defining a table in you database containing these columns: `timestamp, category, name, value`. 
 
-There are seven important methods this module provides:
+There are nine important methods this module provides:
 
 * **set** (in Data::Chronicle::Writer):
 Given a category, name and value stores the JSONified value in Redis and PostgreSQL database under "category::name" group and also stores current
@@ -49,6 +49,12 @@ Given a category, name, start_timestamp and end_timestamp returns an array-ref c
 Given a category, name, and revision returns version of the data the specificied number of revisions in the past.
 If revision 0 is chosen, the latest verson of the data will be returned.
 If revision 1 is chosen, the previous version of the data will be returned.
+
+* **subscribe** (in Data::Chronicle::Subscriber):
+Given a category, name, and callback assigns the callback to be called when a new value is set for the specificied category and name (if the writer has publish_on_set enabled).
+
+* **unsubscribe** (in Data::Chronicle::Subscriber):
+Given a category, name, clears the callbacks associated with the specificied category and name.
 
 ## Examples ##
 

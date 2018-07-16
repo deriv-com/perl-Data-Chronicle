@@ -47,26 +47,27 @@ to save data and another method to retrieve it. All the underlying complexities 
  my $d = get_some_log_data();
 
  my $chronicle_w = Data::Chronicle::Writer->new(
-    cache_writer => $writer,
-    dbic         => $dbic,
-    ttl          => 86400);
+    cache_writer   => $writer,
+    dbic           => $dbic,
+    ttl            => 86400,
+    publish_on_set => 1);
 
- my $chronicle_r = Data::Chronicle::Reader->new(
-    cache_reader => $reader,
-    dbic         => $dbic);
+ my $chronicle_s = Data::Chronicle::Subscriber->new(
+    cache_reader => $subscriber);
 
+ #subscribe to changes to syslog
+ $chronicle_s->subscribe("log_files", "syslog", sub { print 'Hello World' });
 
- #store data into Chronicle - each time we call `set` it will also store
- #a copy of the data for historical data retrieval
+ #store data into Chronicle - each time we call `set` it will also call
+ #the stored subroutine
  $chronicle_w->set("log_files", "syslog", $d);
-
- #retrieve latest data stored for syslog under log_files category
- my $dt = $chronicle_r->get("log_files", "syslog");
-
- #find historical data for `syslog` at given point in time
- my $some_old_data = $chronicle_r->get_for("log_files", "syslog", $epoch1);
+ 
+ #unsubscribe to changes to syslog
+ $chronicle_s->subscribe("log_files", "syslog"); 
 
 =cut
+
+=head1 Members
 
 =head2 cache_subscriber
 
@@ -78,8 +79,6 @@ has 'cache_subscriber' => (
     is      => 'ro',
     default => undef,
 );
-
-=head1 METHODS
 
 =head2 subscribe
 

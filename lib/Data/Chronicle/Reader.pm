@@ -42,26 +42,6 @@ to save data and another method to retrieve it. All the underlying complexities 
 
 =back
 
-There are three important methods this module provides:
-
-=over 4
-
-=item C<set>
-
-Given a category, name and value stores the JSONified value in Redis and PostgreSQL database under "category::name" group and also stores current
-system time as the timestamp for the data (Which can be used for future retrieval if we want to get data as of a specific time). Note that the value
-MUST be either hash-ref or array-ref.
-
-=item C<get>
-
-Given a category and name returns the latest version of the data according to current Redis cache
-
-=item C<get_for>
-
-Given a category, name and timestamp returns version of data under "category::name" as of the given date (using a DB lookup).
-
-=back
-
 =head1 Example
 
  my $d = get_some_log_data();
@@ -74,9 +54,6 @@ Given a category, name and timestamp returns version of data under "category::na
     cache_reader => $reader,
     dbic         => $dbic);
 
- my $chronicle_r2 = Data::Chronicle::Reader->new(
-    cache_reader => $hash_ref);
-
  #store data into Chronicle - each time we call `set` it will also store
  #a copy of the data for historical data retrieval
  $chronicle_w->set("log_files", "syslog", $d);
@@ -88,6 +65,8 @@ Given a category, name and timestamp returns version of data under "category::na
  my $some_old_data = $chronicle_r->get_for("log_files", "syslog", $epoch1);
 
 =cut
+
+=head1 Members
 
 =head2 cache_reader
 
@@ -112,7 +91,11 @@ has 'dbic' => (
     default => undef,
 );
 
-=head3 C<< my $data = get("category1", "name1") >>
+=head2 get
+
+Example:
+
+    my $data = get("category1", "name1");
 
 Query for the latest data under "category1::name1" from the cache reader.
 Will return `undef` if the data does not exist.
@@ -130,7 +113,11 @@ sub get {
     return undef;
 }
 
-=head3 C<< my $data = mget([["category1", "name1"], ["category2", "name2"], ...]) >>
+=head2 mget
+
+Example:
+
+    my @values = mget([["category1", "name1"], ["category2", "name2"], ...]);
 
 Query for the latest data under "category1::name1", "category2::name2", etc from the cache reader.
 Will return an arrayref containing results in the same ordering, with `undef` if the data does not exist.
@@ -147,7 +134,11 @@ sub mget {
     return map { decode_json_utf8($_) if $_ } @cached_data;
 }
 
-=head3 C<< my $data = get_for("category1", "name1", 1447401505) >>
+=head2 get_for
+
+Example:
+
+    my $data = get_for("category1", "name1", 1447401505);
 
 Query Pg archive for the data under "category1::name1" at or exactly before the given epoch/Date::Utility.
 
@@ -177,7 +168,11 @@ sub get_for {
     return decode_json_utf8($db_value);
 }
 
-=head3 C<< my $data = get_for_period("category1", "name1", 1447401505, 1447401900) >>
+=head2 get_for_period
+
+Example:
+
+    my $data = get_for_period("category1", "name1", 1447401505, 1447401900)
 
 Query Pg historical data and return records whose date is between given period.
 
@@ -214,7 +209,11 @@ sub get_for_period {
     return \@result;
 }
 
-=head3 C<< my $data = get_history("category1", "name1", 1) >>
+=head2 get_history
+
+Example:
+
+    my $data = get_history("category1", "name1", 1);
 
 Query Pg archive for the data under "category1::name1" at the provided number of revisions in the past.
 

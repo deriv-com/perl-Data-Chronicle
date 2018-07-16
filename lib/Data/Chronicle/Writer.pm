@@ -47,9 +47,10 @@ to save data and another method to retrieve it. All the underlying complexities 
  my $d = get_some_log_data();
 
  my $chronicle_w = Data::Chronicle::Writer->new(
-    cache_writer => $writer,
-    dbic         => $dbic,
-    ttl          => 86400);
+    cache_writer   => $writer,
+    dbic           => $dbic,
+    ttl            => 86400,
+    publish_on_set => 1);
 
  my $chronicle_r = Data::Chronicle::Reader->new(
     cache_reader => $reader,
@@ -67,6 +68,8 @@ to save data and another method to retrieve it. All the underlying complexities 
  my $some_old_data = $chronicle_r->get_for("log_files", "syslog", $epoch1);
 
 =cut
+
+=head1 Members
 
 =head2 cache_writer
 
@@ -90,8 +93,6 @@ has 'dbic' => (
     is      => 'ro',
     default => undef,
 );
-
-=head1 METHODS
 
 =head2 ttl
 
