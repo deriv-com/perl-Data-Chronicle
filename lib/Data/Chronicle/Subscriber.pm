@@ -90,11 +90,11 @@ Example:
 =cut
 
 sub subscribe {
-    my ($self, $category, $name, $subref) = @_;
-    die 'Subscription requires a coderef' if ref $subref ne 'CODE';
+    my ($self, $category, $name, $callback) = @_;
+    die 'Subscription requires a coderef' if ref $callback ne 'CODE';
 
     my $key = $self->_generate_key($category, $name);
-    return $self->cache_subscriber->subscribe($key, $subref);
+    return $self->cache_subscriber->subscribe($key, $callback);
 }
 
 =head2 unsubscribe
