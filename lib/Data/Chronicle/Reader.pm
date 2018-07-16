@@ -150,10 +150,10 @@ sub mget {
         :                                      die 'Unsupported cache_reader type';
 
     if ($reader_type eq 'redis') {
-        my @cached_data = $self->cache_reader->mget(@keys);
+        my @cached_data = $reader->mget(@keys);
         return map { decode_json_utf8($_) if $_ } @cached_data;
     } elsif ($reader_type eq 'hash') {
-        return map { $self->cache_reader->{$_} } @keys;
+        return map { $reader->{$_} } @keys;
     }
 }
 
