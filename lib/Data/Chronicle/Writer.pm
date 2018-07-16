@@ -76,7 +76,7 @@ cache_writer should be an object of RedisDB.
 
 has 'cache_writer' => (
     is      => 'ro',
-    default => sub { {} },
+    default => undef,
 );
 
 =head2 dbic
@@ -176,13 +176,9 @@ sub mset {
     $self->_validate_rec_date($rec_date);
 
     my $writer = $self->cache_writer;
-    my $writer_type =
-          blessed($self->cache_writer)       ? 'redis'
-        : ref($self->cache_writer) eq 'HASH' ? 'hash'
-        :                                      die 'Unsupported cache_writer type';
 
     # publish & set in transaction
-    $writer->multi if $writer_type eq 'redis';
+    $writer->multi;
     foreach my $entry (@$entries) {
         my $category = $entry->[0];
         my $name     = $entry->[1];
@@ -190,19 +186,15 @@ sub mset {
 
         my $key = $category . '::' . $name;
 
-        if ($writer_type eq 'redis') {
-            my $encoded = encode_json_utf8($value);
-            $writer->publish($key, $encoded) if $self->publish_on_set && !$suppress_pub;
-            $writer->set(
-                $key => $encoded,
-                $ttl ? ('EX' => $ttl) : ());
+        my $encoded = encode_json_utf8($value);
+        $writer->publish($key, $encoded) if $self->publish_on_set && !$suppress_pub;
+        $writer->set(
+            $key => $encoded,
+            $ttl ? ('EX' => $ttl) : ());
 
-            $self->_archive($category, $name, $encoded, $rec_date) if $archive and $self->dbic;
-        } elsif ($writer_type eq 'hash') {
-            $writer->{$key} = $value;
-        }
+        $self->_archive($category, $name, $encoded, $rec_date) if $archive and $self->dbic;
     }
-    $writer->exec if $writer_type eq 'redis';
+    $writer->exec;
 
     return 1;
 }
