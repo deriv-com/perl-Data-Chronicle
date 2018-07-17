@@ -87,7 +87,7 @@ If revision 0 is chosen, the latest version of the data will be returned.
 If revision 1 is chosen, the previous version of the data will be returned.
 
     my $some_old_data = $reader->get_for("category1", "name2", 2);
-    
+
 =head2 L<Data::Chronicle::Subscriber/subscribe>
 
 Given a category, name, and callback assigns the callback to be called when a new value is set for the specified category and name (if the writer has publish_on_set enabled).

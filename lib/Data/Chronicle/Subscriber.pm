@@ -63,7 +63,7 @@ to save data and another method to retrieve it. All the underlying complexities 
  $chronicle_w->set("log_files", "syslog", $d);
 
  #unsubscribe to changes to syslog
- $chronicle_s->unsubscribe("log_files", "syslog"); 
+ $chronicle_s->unsubscribe("log_files", "syslog");
 
 =cut
 
