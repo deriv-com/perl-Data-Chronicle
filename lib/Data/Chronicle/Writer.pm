@@ -173,7 +173,7 @@ sub mset {
     my $suppress_pub = shift // 0;
     my $ttl          = shift // $self->ttl;
 
-    $self->_validate_value($_->[2]) foreach @$entries;
+    $self->_validate_value(@$_) foreach @$entries;
     $self->_validate_rec_date($rec_date);
 
     my $writer = $self->cache_writer;
@@ -181,9 +181,7 @@ sub mset {
     # publish & set in transaction
     $writer->multi;
     foreach my $entry (@$entries) {
-        my $category = $entry->[0];
-        my $name     = $entry->[1];
-        my $value    = $entry->[2];
+        my ($category, $name, $value) = @$entry;
 
         my $key = $category . '::' . $name;
 
@@ -201,8 +199,8 @@ sub mset {
 }
 
 sub _validate_value {
-    my ($self, $value) = @_;
-    die "Cannot store undefined values in Chronicle!" unless defined $value;
+    my ($self, $category, $name, $value) = @_;
+    die "Cannot store an undefined value for ${category}::${name} in Chronicle!" unless defined $value;
     die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
     return;
 }
