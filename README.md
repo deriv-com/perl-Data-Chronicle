@@ -47,7 +47,7 @@ Given a category, name, start_timestamp and end_timestamp returns an array-ref c
 
 * **get_history** (in Data::Chronicle::Reader):
 Given a category, name, and revision returns version of the data the specified number of revisions in the past.
-If revision 0 is chosen, the latest verson of the data will be returned.
+If revision 0 is chosen, the latest version of the data will be returned.
 If revision 1 is chosen, the previous version of the data will be returned.
 
 * **subscribe** (in Data::Chronicle::Subscriber):

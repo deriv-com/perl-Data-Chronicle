@@ -61,7 +61,7 @@ to save data and another method to retrieve it. All the underlying complexities 
  #store data into Chronicle - each time we call `set` it will also call
  #the stored subroutine
  $chronicle_w->set("log_files", "syslog", $d);
- 
+
  #unsubscribe to changes to syslog
  $chronicle_s->unsubscribe("log_files", "syslog"); 
 
