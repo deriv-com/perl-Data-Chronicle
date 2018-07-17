@@ -46,15 +46,15 @@ Given a category, name and timestamp returns version of data under "category::na
 Given a category, name, start_timestamp and end_timestamp returns an array-ref containing all data stored between given period for the given "category::name" (using a DB lookup).
 
 * **get_history** (in Data::Chronicle::Reader):
-Given a category, name, and revision returns version of the data the specificied number of revisions in the past.
+Given a category, name, and revision returns version of the data the specified number of revisions in the past.
 If revision 0 is chosen, the latest verson of the data will be returned.
 If revision 1 is chosen, the previous version of the data will be returned.
 
 * **subscribe** (in Data::Chronicle::Subscriber):
-Given a category, name, and callback assigns the callback to be called when a new value is set for the specificied category and name (if the writer has publish_on_set enabled).
+Given a category, name, and callback assigns the callback to be called when a new value is set for the specified category and name (if the writer has publish_on_set enabled).
 
 * **unsubscribe** (in Data::Chronicle::Subscriber):
-Given a category, name, clears the callbacks associated with the specificied category and name.
+Given a category, name, clears the callbacks associated with the specified category and name.
 
 ## Examples ##
 

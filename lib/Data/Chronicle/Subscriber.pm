@@ -37,12 +37,12 @@ In addition to caching every incoming data, it is also stored in PostgreSQL for 
 
 =item B<Transparent>
 
-This modules hides all the details about distribution, caching, database structure and ... from developer. He only needs to call a method
+This modules hides all the internal details including distribution, caching, and database structure from the developer. He only needs to call a method
 to save data and another method to retrieve it. All the underlying complexities are handled by the module.
 
 =back
 
-=head1 Example
+=head1 EXAMPLE
 
  my $d = get_some_log_data();
 
@@ -63,15 +63,15 @@ to save data and another method to retrieve it. All the underlying complexities 
  $chronicle_w->set("log_files", "syslog", $d);
  
  #unsubscribe to changes to syslog
- $chronicle_s->subscribe("log_files", "syslog"); 
+ $chronicle_s->unsubscribe("log_files", "syslog"); 
 
 =cut
 
-=head1 Members
+=head1 METHODS
 
 =head2 cache_subscriber
 
-cache_subscriber should be an object of RedisDB.
+cache_subscriber should be an instance of L<RedisDB>.
 
 =cut
 
@@ -156,7 +156,7 @@ L<http://cpanratings.perl.org/d/Data-Chronicle>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Data-Chronicle/>
+L<https://metacpan.org/release/Data-Chronicle/>
 
 =back
 
