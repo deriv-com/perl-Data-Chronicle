@@ -5,8 +5,7 @@ use strict;
 use warnings;
 use Data::Chronicle;
 use Date::Utility;
-use Encode qw(decode_utf8);
-use JSON::MaybeXS;
+use JSON::MaybeUTF8 qw(decode_json_utf8);
 use Moose;
 
 =head1 NAME
@@ -38,32 +37,12 @@ In addition to caching every incoming data, it is also stored in PostgreSQL for 
 
 =item B<Transparent>
 
-This modules hides all the details about distribution, caching, database structure and ... from developer. He only needs to call a method
+This modules hides all the internal details including distribution, caching, and database structure from the developer. He only needs to call a method
 to save data and another method to retrieve it. All the underlying complexities are handled by the module.
 
 =back
 
-There are three important methods this module provides:
-
-=over 4
-
-=item C<set>
-
-Given a category, name and value stores the JSONified value in Redis and PostgreSQL database under "category::name" group and also stores current
-system time as the timestamp for the data (Which can be used for future retrieval if we want to get data as of a specific time). Note that the value
-MUST be either hash-ref or array-ref.
-
-=item C<get>
-
-Given a category and name returns the latest version of the data according to current Redis cache
-
-=item C<get_for>
-
-Given a category, name and timestamp returns version of data under "category::name" as of the given date (using a DB lookup).
-
-=back
-
-=head1 Example
+=head1 EXAMPLE
 
  my $d = get_some_log_data();
 
@@ -74,9 +53,6 @@ Given a category, name and timestamp returns version of data under "category::na
  my $chronicle_r = Data::Chronicle::Reader->new(
     cache_reader => $reader,
     dbic         => $dbic);
-
- my $chronicle_r2 = Data::Chronicle::Reader->new(
-    cache_reader => $hash_ref);
 
  #store data into Chronicle - each time we call `set` it will also store
  #a copy of the data for historical data retrieval
@@ -90,10 +66,11 @@ Given a category, name and timestamp returns version of data under "category::na
 
 =cut
 
+=head1 METHODS
+
 =head2 cache_reader
 
-cache_reader can be an object which has `get` method used to fetch data.
-or it can be a plain hash-ref.
+cache_reader should be an instance of L<RedisDB>.
 
 =cut
 
@@ -104,7 +81,7 @@ has 'cache_reader' => (
 
 =head2 dbic
 
-dbic should be an object of DBIx::Connector.
+dbic should be an instance of L<DBIx::Connector>.
 
 =cut
 
@@ -114,7 +91,11 @@ has 'dbic' => (
     default => undef,
 );
 
-=head3 C<< my $data = get("category1", "name1") >>
+=head2 get
+
+Example:
+
+    my $data = get("category1", "name1");
 
 Query for the latest data under "category1::name1" from the cache reader.
 Will return `undef` if the data does not exist.
@@ -126,19 +107,38 @@ sub get {
     my $category = shift;
     my $name     = shift;
 
-    my $key = $category . '::' . $name;
-
-    if (blessed($self->cache_reader)) {
-        my $cached_data = $self->cache_reader->get($key);
-        return JSON::MaybeXS->new->decode(decode_utf8($cached_data)) if defined $cached_data;
-    } else {
-        return $self->cache_reader->{$key};
-    }
+    my @cached_data = $self->mget([[$category, $name]]);
+    return $cached_data[0] if @cached_data;
 
     return undef;
 }
 
-=head3 C<< my $data = get_for("category1", "name1", 1447401505) >>
+=head2 mget
+
+Example:
+
+    my @values = mget([["category1", "name1"], ["category2", "name2"], ...]);
+
+Query for the latest data under "category1::name1", "category2::name2", etc from the cache reader.
+Will return an arrayref containing results in the same ordering, with `undef` if the data does not exist.
+
+=cut
+
+sub mget {
+    my $self  = shift;
+    my $pairs = shift;
+
+    my @keys = map { $_->[0] . '::' . $_->[1] } @$pairs;
+
+    my @cached_data = $self->cache_reader->mget(@keys);
+    return map { decode_json_utf8($_) if $_ } @cached_data;
+}
+
+=head2 get_for
+
+Example:
+
+    my $data = get_for("category1", "name1", 1447401505);
 
 Query Pg archive for the data under "category1::name1" at or exactly before the given epoch/Date::Utility.
 
@@ -165,10 +165,14 @@ sub get_for {
     my $id_value = (sort keys %{$db_data})[0];
     my $db_value = $db_data->{$id_value}->{value};
 
-    return JSON::MaybeXS->new->decode($db_value);
+    return decode_json_utf8($db_value);
 }
 
-=head3 C<< my $data = get_for_period("category1", "name1", 1447401505, 1447401900) >>
+=head2 get_for_period
+
+Example:
+
+    my $data = get_for_period("category1", "name1", 1447401505, 1447401900)
 
 Query Pg historical data and return records whose date is between given period.
 
@@ -199,13 +203,17 @@ sub get_for_period {
     for my $id_value (keys %$db_data) {
         my $db_value = $db_data->{$id_value}->{value};
 
-        push @result, JSON::MaybeXS->new->decode($db_value);
+        push @result, decode_json_utf8($db_value);
     }
 
     return \@result;
 }
 
-=head3 C<< my $data = get_history("category1", "name1", 1) >>
+=head2 get_history
+
+Example:
+
+    my $data = get_history("category1", "name1", 1);
 
 Query Pg archive for the data under "category1::name1" at the provided number of revisions in the past.
 
@@ -231,7 +239,7 @@ sub get_history {
     my $id_value = (sort keys %{$db_data})[0];
     my $db_value = $db_data->{$id_value}->{value};
 
-    return JSON::MaybeXS->new->decode($db_value);
+    return decode_json_utf8($db_value);
 }
 
 no Moose;
@@ -274,7 +282,7 @@ L<http://cpanratings.perl.org/d/Data-Chronicle>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Data-Chronicle/>
+L<https://metacpan.org/release/Data-Chronicle/>
 
 =back
 
