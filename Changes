@@ -1,6 +1,8 @@
 Revision history for Data-Chronicle
 
 {{$NEXT}}
+
+0.19      2018-07-25 05:26:29+00:00 UTC
         Bug fix: Fixed compatibility for RedisDB API
 
 0.18      2018-07-23 05:32:57+00:00 UTC
