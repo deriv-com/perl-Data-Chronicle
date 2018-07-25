@@ -7,67 +7,60 @@ use 5.014000;
 use ExtUtils::MakeMaker 6.48;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Chronicle storage system",
-  "AUTHOR" => "binary.com <BINARY\@cpan.org>",
-  "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.48"
-  },
-  "DISTNAME" => "Data-Chronicle",
-  "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014000",
-  "NAME" => "Data::Chronicle",
-  "PREREQ_PM" => {
-    "DBD::Pg" => 0,
-    "DBIx::Connector" => 0,
-    "Date::Utility" => 0,
-    "JSON::MaybeUTF8" => 0,
-    "Moose" => 0,
-    "Test::Mock::Redis" => 0,
-    "Test::PostgreSQL" => 0
-  },
-  "TEST_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "File::Spec" => 0,
-    "IO::Handle" => 0,
-    "IPC::Open3" => 0,
-    "Test::CheckDeps" => "0.010",
-    "Test::Exception" => 0,
-    "Test::More" => "0.94",
-    "Test::NoWarnings" => 0
-  },
-  "VERSION" => "0.18",
-  "test" => {
-    "TESTS" => "t/*.t"
-  }
-);
-
+    "ABSTRACT"           => "Chronicle storage system",
+    "AUTHOR"             => "binary.com <BINARY\@cpan.org>",
+    "CONFIGURE_REQUIRES" => {"ExtUtils::MakeMaker" => "6.48"},
+    "DISTNAME"           => "Data-Chronicle",
+    "LICENSE"            => "perl",
+    "MIN_PERL_VERSION"   => "5.014000",
+    "NAME"               => "Data::Chronicle",
+    "PREREQ_PM"          => {
+        "DBD::Pg"           => 0,
+        "DBIx::Connector"   => 0,
+        "Date::Utility"     => 0,
+        "JSON::MaybeUTF8"   => 0,
+        "Moose"             => 0,
+        "Test::Mock::Redis" => 0,
+        "Test::PostgreSQL"  => 0
+    },
+    "TEST_REQUIRES" => {
+        "ExtUtils::MakeMaker" => 0,
+        "File::Spec"          => 0,
+        "IO::Handle"          => 0,
+        "IPC::Open3"          => 0,
+        "Test::CheckDeps"     => "0.010",
+        "Test::Exception"     => 0,
+        "Test::More"          => "0.94",
+        "Test::NoWarnings"    => 0
+    },
+    "VERSION" => "0.18",
+    "test"    => {"TESTS" => "t/*.t"});
 
 my %FallbackPrereqs = (
-  "DBD::Pg" => 0,
-  "DBIx::Connector" => 0,
-  "Date::Utility" => 0,
-  "ExtUtils::MakeMaker" => 0,
-  "File::Spec" => 0,
-  "IO::Handle" => 0,
-  "IPC::Open3" => 0,
-  "JSON::MaybeUTF8" => 0,
-  "Moose" => 0,
-  "Test::CheckDeps" => "0.010",
-  "Test::Exception" => 0,
-  "Test::Mock::Redis" => 0,
-  "Test::More" => "0.94",
-  "Test::NoWarnings" => 0,
-  "Test::PostgreSQL" => 0
+    "DBD::Pg"             => 0,
+    "DBIx::Connector"     => 0,
+    "Date::Utility"       => 0,
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec"          => 0,
+    "IO::Handle"          => 0,
+    "IPC::Open3"          => 0,
+    "JSON::MaybeUTF8"     => 0,
+    "Moose"               => 0,
+    "Test::CheckDeps"     => "0.010",
+    "Test::Exception"     => 0,
+    "Test::Mock::Redis"   => 0,
+    "Test::More"          => "0.94",
+    "Test::NoWarnings"    => 0,
+    "Test::PostgreSQL"    => 0
 );
 
-
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
-  delete $WriteMakefileArgs{TEST_REQUIRES};
-  delete $WriteMakefileArgs{BUILD_REQUIRES};
-  $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
+unless (eval { ExtUtils::MakeMaker->VERSION(6.63_03) }) {
+    delete $WriteMakefileArgs{TEST_REQUIRES};
+    delete $WriteMakefileArgs{BUILD_REQUIRES};
+    $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
 }
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+    unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
