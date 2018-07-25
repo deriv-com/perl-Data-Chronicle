@@ -1,6 +1,7 @@
 Revision history for Data-Chronicle
 
 {{$NEXT}}
+        Bug fix: Fixed compatibility for RedisDB API
 
 0.18      2018-07-23 05:32:57+00:00 UTC
         Created new Subscriber package so a separate connection can be used for this functionality
