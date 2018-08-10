@@ -130,8 +130,8 @@ sub mget {
 
     my @keys = map { $_->[0] . '::' . $_->[1] } @$pairs;
 
-    my @cached_data = $self->cache_reader->mget(@keys);
-    return map { decode_json_utf8($_) if $_ } @cached_data;
+    my $cached_data = $self->cache_reader->mget(@keys);
+    return map { decode_json_utf8($_) if $_ } @$cached_data;
 }
 
 =head2 get_for
