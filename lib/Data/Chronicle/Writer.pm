@@ -178,6 +178,9 @@ sub mset {
 
     my $writer = $self->cache_writer;
 
+    # ping the writter to make sure the connection is on
+    $writer->ping();
+
     # publish & set in transaction
     $writer->multi;
     foreach my $entry (@$entries) {
