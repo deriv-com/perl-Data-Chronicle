@@ -1,29 +1,21 @@
 version: 2
+
 jobs:
   build:
     docker:
-      - image: regentmarkets/debian-ci:stable
+      - image: regentmarkets/debian-ci:latest
         user: nobody
         auth:
           username: circle4regentmarkets
           password: $DOCKERHUB_PASSWORD
-    working_directory: /home/git/regentmarkets/perl-Data-Chronicle
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "26:72:b1:08:0f:c1:3b:2b:2d:ea:61:7d:d6:11:63:fb"
-      - checkout
       - run:
-          name: Update git repositories
-          command: /opt/circle/prepare-test.sh
+        name: install dzil
+        command: |
+          cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover App::cpm Devel::Cover::Report::Codecov
+          cpm install -w 2 --mirror=http://cpan.cpantesters.org/ -g $(dzil authordeps --missing)
+          cpm install -w 2 --mirror=http://cpan.cpantesters.org/ -g $(dzil listdeps --author --missing)
       - run:
-          name: Run test
-          command: |
-            source /etc/profile.d/perl5.sh
-            dzil smoke --release --author && dzil cover -test && dzil xtest
-workflows:
-  version: 2
-  build-workflow:
-    jobs:
-      - build:
-          context: perl
+        name: dzil test 
+        command: |
+          dzil smoke --release --author && dzil cover -test -report codecov && dzil xtest
