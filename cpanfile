@@ -5,7 +5,6 @@ requires 'JSON::MaybeUTF8';
 requires 'Moose';
 requires 'Test::PostgreSQL';
 requires 'Test::Mock::Redis';
-requires 'YAML::XS', '0.77';
 requires 'perl', '5.014';
 
 on configure => sub {
