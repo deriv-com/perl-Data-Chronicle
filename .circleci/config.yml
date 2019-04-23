@@ -7,7 +7,7 @@ jobs:
         auth:
           username: circle4regentmarkets
           password: $DOCKERHUB_PASSWORD
-    working_directory: /home/git/regentmarkets/perl-Finance-Asset
+    working_directory: /home/git/regentmarkets/perl-Data-Chronicle
     steps:
       - add_ssh_keys:
           fingerprints:
