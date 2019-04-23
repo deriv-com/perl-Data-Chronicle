@@ -38,7 +38,7 @@ package t::InMemoryCache {
         delete $self->cache->{"subscribe::$key"};
     }
     
-    sub ping { }
+    sub ping { return "PONG"; }
 };
 
 my $data = {sample => 'data'};
