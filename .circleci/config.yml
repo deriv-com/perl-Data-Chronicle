@@ -9,6 +9,9 @@ jobs:
           name: Install Perl packages
           command: apt-get update && apt-get install -y cpanminus make gcc
       - run:
+          name: Install redis
+          command: apt install redis-server
+      - run:
           name: Install dzil
           command: cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover App::cpm Devel::Cover::Report::Codecov https://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-7.29.tar.gz https://cpan.metacpan.org/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-7.30.tar.gz
       - run:
