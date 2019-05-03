@@ -1,6 +1,9 @@
 version: 2
 jobs:
   build:
+    branches:
+      only:
+        - omar-binary/move_data_chronicle_to_circleci_and_test_revamp
     docker:
       - image: regentmarkets/debian-ci:stable
         user: nobody
