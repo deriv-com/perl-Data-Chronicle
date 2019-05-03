@@ -1,0 +1,29 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: regentmarkets/debian-ci:stable
+        user: nobody
+        auth:
+          username: circle4regentmarkets
+          password: $DOCKERHUB_PASSWORD
+    working_directory: /home/git/regentmarkets/perl-Data-Chronicle
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "26:72:b1:08:0f:c1:3b:2b:2d:ea:61:7d:d6:11:63:fb"
+      - checkout
+      - run:
+          name: Update git repositories
+          command: /opt/circle/prepare-test.sh
+      - run:
+          name: Run test
+          command: |
+            source /etc/profile.d/perl5.sh
+            dzil test
+workflows:
+  version: 2
+  build-workflow:
+    jobs:
+      - build:
+          context: perl
