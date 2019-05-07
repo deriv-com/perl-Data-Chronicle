@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: regentmarkets/debian-perl
+      - image: regentmarkets/debian-perl:wheezy-5.26.2
       - image: redis:2.8.17
     steps:
       - checkout
