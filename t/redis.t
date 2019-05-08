@@ -1,12 +1,13 @@
 use strict;
 use warnings;
 
+use Data::Chronicle::Writer;
+use RedisDB;
 use Date::Utility;
 use Test::More;
 use Test::Exception;
-use Data::Chronicle::Writer;
 require Test::NoWarnings;
-use RedisDB;
+
 
 my $data = {sample => 'data'};
 
