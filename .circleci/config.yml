@@ -16,7 +16,7 @@ jobs:
           command: cpm install -w 2 --mirror=http://cpan.cpantesters.org/ -g $(dzil listdeps --author --missing)
       - run:
           name: Start Redis
-          command: redis-server --daemonize yes
+          command: redis-server --port 6379 --daemonize yes
       - run:
           name: Run smoke test
           command: dzil smoke --release --author
