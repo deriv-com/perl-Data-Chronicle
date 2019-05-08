@@ -5,10 +5,7 @@ use Date::Utility;
 use Test::More;
 use Test::Exception;
 use Data::Chronicle::Writer;
-use Data::Chronicle::Reader;
 require Test::NoWarnings;
-use BOM::Config::Chronicle;
-use YAML::XS;
 use RedisDB;
 
 my $data = {sample => 'data'};
