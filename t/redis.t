@@ -8,6 +8,7 @@ use Test::More;
 use Test::Exception;
 require Test::NoWarnings;
 
+plan skip_all => "\$ENV{CHECK_REDIS} is not set, skipping" unless $ENV{CHECK_REDIS};
 
 my $data = {sample => 'data'};
 

@@ -18,6 +18,10 @@ jobs:
           name: Start Redis
           command: redis-server --port 6379 --daemonize yes
       - run:
+          name: Setup Environment Variables
+          command: |
+            echo 'export CHECK_REDIS=1' >> $BASH_ENV
+      - run:
           name: Run smoke test
           command: dzil smoke --release --author
       - run:
