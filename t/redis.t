@@ -8,16 +8,15 @@ use Test::More;
 use Test::Exception;
 require Test::NoWarnings;
 
-plan skip_all => "\$ENV{CHECK_REDIS} is not set, skipping" unless $ENV{CHECK_REDIS};
+BEGIN {
+    plan skip_all => 'needs TEST_REDIS=redis://localhost:6379' unless $ENV{TEST_REDIS};
+}
 
 my $data = {sample => 'data'};
 
 subtest "Call Set after dropping the connection" => sub {
 
-    my $connection = RedisDB->new(
-        host => 'localhost',
-        port => '6379',
-    );
+    my $connection = RedisDB->new(url => $ENV{TEST_REDIS});
 
     my $writer = Data::Chronicle::Writer->new(
         publish_on_set => 1,

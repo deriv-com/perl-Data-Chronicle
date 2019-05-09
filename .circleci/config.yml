@@ -20,7 +20,7 @@ jobs:
       - run:
           name: Setup Environment Variables
           command: |
-            echo 'export CHECK_REDIS=1' >> $BASH_ENV
+            echo 'export TEST_REDIS=redis://localhost:6379' >> $BASH_ENV
       - run:
           name: Run smoke test
           command: dzil smoke --release --author
