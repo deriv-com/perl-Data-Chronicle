@@ -1,0 +1,32 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: regentmarkets/debian-pg:wheezy-5.26.2-96
+    steps:
+      - checkout
+      - run:
+          name: Install dzil
+          command: cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover App::cpm Devel::Cover::Report::Codecov https://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-7.29.tar.gz https://cpan.metacpan.org/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-7.30.tar.gz
+      - run:
+          name: Install dzil author deps
+          command: cpm install -w 2 --mirror=http://cpan.cpantesters.org/ -g $(dzil authordeps --missing)
+      - run:
+          name: Install distribution deps
+          command: cpm install -w 2 --mirror=http://cpan.cpantesters.org/ -g $(dzil listdeps --author --missing)
+      - run:
+          name: Start Redis
+          command: redis-server --port 6379 --daemonize yes
+      - run:
+          name: Setup Environment Variables
+          command: |
+            echo 'export TEST_REDIS=redis://localhost:6379' >> $BASH_ENV
+      - run:
+          name: Run smoke test
+          command: dzil smoke --release --author
+      - run:
+          name: Run coverage test
+          command: dzil cover -test -report codecov
+      - run:
+          name: Run extended author test
+          command: dzil xtest
