@@ -2,9 +2,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: regentmarkets/debian-pg:wheezy-5.26.2-96
+      - image: regentmarkets/debian-pg:stretch-5.26.2-96
     steps:
       - checkout
+      - run:
+          name: Install library dependencies
+          command: apt-get update && apt-get install -y --no-install-recommends libssl-dev zlib1g-dev pkg-config
       - run:
           name: Install dzil
           command: cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover App::cpm Devel::Cover::Report::Codecov https://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-7.29.tar.gz https://cpan.metacpan.org/authors/id/B/BI/BINGOS/ExtUtils-MakeMaker-7.30.tar.gz
