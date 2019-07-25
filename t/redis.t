@@ -26,8 +26,8 @@ subtest "Call Set after dropping the connection" => sub {
     $writer->set('namespace', 'category', $data, Date::Utility->new, 0);
 
     # Kill All Client Connections
-    my $cmd = qw(redis-cli -p 6379 CLIENT KILL TYPE normal);
-    for (1..5) {   system($cmd);   sleep(1);}
+    my @cmd = qw(redis-cli -p 6379 CLIENT KILL TYPE normal);
+    for (1..5) {   system(@cmd);   sleep(1);}
 
     # call set again after dropping the connection
     # check the connection will be recreated
