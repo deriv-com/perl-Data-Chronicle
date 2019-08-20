@@ -33,7 +33,7 @@ Creates a simulated chronicle connected to a temporary storage.
 sub get_mocked_chronicle {
     my $redis = Test::Mock::Redis->new(server => 'whatever');
 
-    my $pgsql = Test::PostgreSQL->new();
+    state $pgsql = Test::PostgreSQL->new();
     my $dbic  = DBIx::Connector->new($pgsql->dsn);
     $dbic->mode('ping');
     my $stmt = qq(CREATE TABLE chronicle (
@@ -61,21 +61,6 @@ sub get_mocked_chronicle {
         dbic         => $dbic,
         ttl          => 86400
     );
-
-    #we need to store a reference to $pgsql or else, as soon as this method
-    #is returned, it will be destroyed and connection will be lost.
-    $chronicle_r->meta->add_attribute(
-        dummy => (
-            accessor => 'dummy',
-        ));
-
-    $chronicle_w->meta->add_attribute(
-        dummy => (
-            accessor => 'dummy',
-        ));
-
-    $chronicle_r->dummy($pgsql);
-    $chronicle_w->dummy($pgsql);
 
     return ($chronicle_r, $chronicle_w);
 }
