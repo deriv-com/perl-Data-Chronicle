@@ -242,6 +242,7 @@ SQL
 }
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 =head1 AUTHOR
 

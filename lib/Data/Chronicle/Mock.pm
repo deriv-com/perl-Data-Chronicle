@@ -62,20 +62,13 @@ sub get_mocked_chronicle {
         ttl          => 86400
     );
 
-    #we need to store a reference to $pgsql or else, as soon as this method
-    #is returned, it will be destroyed and connection will be lost.
-    $chronicle_r->meta->add_attribute(
-        dummy => (
-            accessor => 'dummy',
-        ));
-
-    $chronicle_w->meta->add_attribute(
-        dummy => (
-            accessor => 'dummy',
-        ));
-
-    $chronicle_r->dummy($pgsql);
-    $chronicle_w->dummy($pgsql);
+    # We need to store this handle to prevent early destruction
+    # The code here depends on the internal representation of
+    # the objects but I think it's fine here since this code is
+    # in the same package.
+    # This way you can have several different instances at the
+    # same time during testing.
+    $chronicle_r->{' p g s q l '} = $chronicle_r->{' p g s q l '} = $pgsql;
 
     return ($chronicle_r, $chronicle_w);
 }

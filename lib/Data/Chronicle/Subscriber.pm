@@ -117,6 +117,7 @@ sub _generate_key {
 }
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 =head1 AUTHOR
 
