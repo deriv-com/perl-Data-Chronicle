@@ -40,8 +40,6 @@ use Test::MockModule;
 my $mocked_mock_redis = Test::MockModule->new('Test::Mock::Redis');
 $mocked_mock_redis->mock('mget', sub { return [$mocked_mock_redis->original('mget')->(@_)] });
 
-## VERSION
-
 =head3 C<< my $ch = get_mocked_chronicle(); >>
 
 Creates a simulated chronicle connected to a temporary storage.
