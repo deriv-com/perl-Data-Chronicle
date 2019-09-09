@@ -21,7 +21,7 @@ use Data::Chronicle::Writer;
 {
     # We need to store the Test::PostgreSQL handle somewhere to prevent
     # premature destruction of the database.
-    package My::Connector;    ## no critic
+    package Data::Chronicle::Mock::Connector;    ## no critic
     use strict;
     use warnings;
     use parent qw/DBIx::Connector/;
@@ -50,7 +50,7 @@ sub get_mocked_chronicle {
     my $redis = Test::Mock::Redis->new(server => 'whatever');
 
     my $pgsql = Test::PostgreSQL->new();
-    my $dbic  = My::Connector->new($pgsql->dsn);
+    my $dbic  = Data::Chronicle::Mock::Connector->new($pgsql->dsn);
     $dbic->testdb($pgsql);
     $dbic->mode('ping');
     my $stmt = qq(CREATE TABLE chronicle (
