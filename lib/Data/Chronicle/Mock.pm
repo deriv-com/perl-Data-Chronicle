@@ -19,7 +19,7 @@ use Data::Chronicle::Writer;
 {
     # We need to store the Test::PostgreSQL handle somewhere to prevent
     # premature destruction of the database.
-    package My::Connector;
+    package My::Connector;    ## no critic
     use strict;
     use warnings;
     use parent qw/DBIx::Connector/;
