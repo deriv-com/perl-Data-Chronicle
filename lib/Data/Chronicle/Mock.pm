@@ -16,6 +16,22 @@ use Test::Mock::Redis;
 use Data::Chronicle::Reader;
 use Data::Chronicle::Writer;
 
+{
+    # We need to store the Test::PostgreSQL handle somewhere to prevent
+    # premature destruction of the database.
+    package My::Connector;
+    use strict;
+    use warnings;
+    use parent qw/DBIx::Connector/;
+    sub testdb {
+       my $self = shift;
+       if (@_) {
+           $self->{' p g s q l '} = shift;
+       }
+       return $self->{' p g s q l '};
+    }
+}
+
 # This is to resolve a compatibility issue between Test::Mock::Redis (where mget returns an array)
 #   and RedisDB (where mget returns an arrayref).
 use Test::MockModule;
@@ -34,7 +50,8 @@ sub get_mocked_chronicle {
     my $redis = Test::Mock::Redis->new(server => 'whatever');
 
     my $pgsql = Test::PostgreSQL->new();
-    my $dbic  = DBIx::Connector->new($pgsql->dsn);
+    my $dbic  = My::Connector->new($pgsql->dsn);
+    $dbic->testdb($pgsql);
     $dbic->mode('ping');
     my $stmt = qq(CREATE TABLE chronicle (
       id bigserial,
@@ -61,14 +78,6 @@ sub get_mocked_chronicle {
         dbic         => $dbic,
         ttl          => 86400
     );
-
-    # We need to store this handle to prevent early destruction
-    # The code here depends on the internal representation of
-    # the objects but I think it's fine here since this code is
-    # in the same package.
-    # This way you can have several different instances at the
-    # same time during testing.
-    $chronicle_r->{' p g s q l '} = $chronicle_r->{' p g s q l '} = $pgsql;
 
     return ($chronicle_r, $chronicle_w);
 }
