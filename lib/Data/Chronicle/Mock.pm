@@ -16,6 +16,8 @@ use Test::Mock::Redis;
 use Data::Chronicle::Reader;
 use Data::Chronicle::Writer;
 
+## VERSION
+
 {
     # We need to store the Test::PostgreSQL handle somewhere to prevent
     # premature destruction of the database.
