@@ -16,7 +16,7 @@ jobs:
           command: cpanm --quiet --notest $(dzil authordeps --missing)
       - run:
           name: Install distribution deps
-          command: cpanm --installdeps .
+          command: cpanm -n --installdeps .
       - run:
           name: Start Redis
           command: redis-server --port 6379 --daemonize yes
