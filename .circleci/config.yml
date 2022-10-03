@@ -1,93 +1,35 @@
-alias:
-  - &install_dzil 
-    run:
-      command: |
-        cpm install -g --no-test Dist::Zilla Dist::Zilla::App::Command::cover ExtUtils::MakeMaker
-      name: Install Dzil
-  - &install_author_deps
-    run: 
-      name: Install dzil author dependencies
-      command: |
-        cpm install -g \
-        -w 2 \
-        --mirror=http://cpan.cpantesters.org/ $(dzil authordeps --missing)
-  - &install_deps
-    run:
-      name: Install dist deps
-      command: |
-        # see https://github.com/team-at-cpan/Dist-Zilla-Plugin-PodInherit/issues/1 to check why we not use 
-        # dzil listdeps --missing here
-        # dzil listdeps --author --missing --cpanm-versions | xargs cpanm -n
-        cpanm --installdeps .
- 
+version: 2
 jobs:
-  test:
-    parameters:
-      perl-version:
-        description: The Perl version we want to test with
-        type: string
-        default: "5.34"
+  build:
     docker:
-      - image: perldocker/perl-tester:<< parameters.perl-version >>
+      - image: regentmarkets/debian-pg:stretch-5.26.2-96
     steps:
       - checkout
-      - *install_dzil
-      - *install_author_deps
-      - *install_deps
       - run:
-          name: Run Tests
-          command: |
-            dzil smoke --release --author && dzil cover -test && dzil xtest
-  release:
-    docker:
-      - image: perldocker/perl-tester:5.34
-    steps:
-      - checkout
-      - *install_dzil
-      - *install_author_deps
-      - *install_deps
+          name: Install library dependencies
+          command: apt-get update && apt-get install -y --no-install-recommends libssl-dev zlib1g-dev pkg-config
       - run:
-          name: setup PAUSE account
-          command: |
-            echo -e "user $PAUSE_USER\npassword $PAUSE_PASSWORD\n" >> ~/.pause
+          name: Install dzil
+          command: cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Codecov
       - run:
-          name: setup git
-          command: |
-            git config --global user.email "circleci@binary.com"
-            git config --global user.name "circleci"
-            # set remote github because dzil will push to github
-            # https://metacpan.org/release/DERIV/Dist-Zilla-PluginBundle-Author-DERIV-0.003/source/lib/Dist/Zilla/PluginBundle/Author/DERIV.pm#L122
-            git remote add github $(git remote get-url origin)
+          name: Install dzil author deps
+          command: cpanm --quiet --notest $(dzil authordeps --missing)
       - run:
-          name: Release to PAUSE
+          name: Install distribution deps
+          command: cpanm --quiet --notest $(dzil listdeps --author --missing)
+      - run:
+          name: Start Redis
+          command: redis-server --port 6379 --daemonize yes
+      - run:
+          name: Setup Environment Variables
           command: |
-            if grep -Pzq '\{\{\$NEXT\}\}\n\s*\n' Changes
-            then
-                echo "No changes, no need release"
-                exit 0
-            fi
-            echo "y\n" | DZIL_CONFIRMRELEASE_DEFAULT=y dzil release
-            git push
-
-workflows:
-  build-workflow:
-    jobs: &1
-    - test:
-        matrix:
-          parameters:
-            perl-version:
-              - "5.24"
-              - "5.26"
-              - "5.28"
-              - "5.30"
-              - "5.32"
-              - "5.34"
-    - release:
-       context: release-deriv
-       requires:
-         - test
-       filters:
-         branches:
-           only: 
-           - master
-version: 2.1
+            echo 'export TEST_REDIS=redis://localhost:6379' >> $BASH_ENV
+      - run:
+          name: Run smoke test
+          command: dzil smoke --release --author
+      - run:
+          name: Run coverage test
+          command: dzil cover -test -report codecov
+      - run:
+          name: Run extended author test
+          command: dzil xtest
