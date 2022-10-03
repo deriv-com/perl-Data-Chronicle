@@ -17,4 +17,6 @@ on test => sub {
     requires 'Test::NoWarnings';
     requires 'RedisDB';
     requires 'Test::MockModule';
+    requires 'Test::CheckDeps';
+    requires 'Test::NoTabs';
 };
