@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test:
     docker:
       - image: regentmarkets/debian-pg:stretch-5.26.2-96
     steps:
