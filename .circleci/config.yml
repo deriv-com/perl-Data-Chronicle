@@ -60,8 +60,7 @@ jobs:
                 echo "No changes, no need release"
                 exit 0
             fi
-            echo "y\n" | DZIL_CONFIRMRELEASE_DEFAULT=y dzil release
-            git push
+            cat ~/.pause
 
 workflows:
   build-workflow:
@@ -71,8 +70,4 @@ workflows:
        context: release-binary
        requires:
          - test
-       filters:
-         branches:
-           only: 
-           - master
 
