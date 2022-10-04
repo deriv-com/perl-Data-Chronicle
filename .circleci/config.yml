@@ -36,3 +36,7 @@ jobs:
       - run:
           name: Run extended author test
           command: dzil xtest
+workflows:
+  build-workflow:
+    jobs:
+    - test
