@@ -60,8 +60,9 @@ jobs:
                 echo "No changes, no need release"
                 exit 0
             fi
+            # use git push to test permission
+            git push github master
             echo "y\n" | DZIL_CONFIRMRELEASE_DEFAULT=y dzil release
-            git push
 
 workflows:
   build-workflow:
