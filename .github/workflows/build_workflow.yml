@@ -31,19 +31,16 @@ jobs:
       -
         name: Install Perl Dependencies
         run: |
-          # cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Codecov
-          # cpanm --quiet --notest $(dzil authordeps --missing)
-          # cpanm -n --installdeps .
-          # cpanm --quiet --notest $(dzil listdeps --author --missing)
+          cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Codecov
+          cpanm --quiet --notest $(dzil authordeps --missing)
+          cpanm -n --installdeps .
+          cpanm --quiet --notest $(dzil listdeps --author --missing)
       -
-        name: check git version
-        run: git --version
-      # -
-      #   name: Run Smoke Test
-      #   run: dzil smoke --release --author
-      # -
-      #   name: Run Coverage Test
-      #   run: dzil cover -test -report codecov
-      # -
-      #   name: Run extended author test
-      #   run: dzil xtest
+        name: Run Smoke Test
+        run: dzil smoke --release --author
+      -
+        name: Run Coverage Test
+        run: dzil cover -test -report codecov
+      -
+        name: Run extended author test
+        run: dzil xtest
