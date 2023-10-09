@@ -24,7 +24,9 @@ jobs:
     steps:
       -
         name: Prepare Environment
-        run: apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl zlib1g-dev pkg-config git libpq-dev apt-transport-https ca-certificates
+        run: | 
+          apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl zlib1g-dev pkg-config git libpq-dev apt-transport-https ca-certificates
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       -
         name: Checkout Code
         uses: actions/checkout@v4
