@@ -26,15 +26,8 @@ jobs:
       -
         name: Prepare Environment
         run: |
-          apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl zlib1g-dev pkg-config git libdbd-pg-perl
-          # cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Codecov
-          # cpanm --quiet --notest $(dzil authordeps --missing)
-          # cpanm -n --installdeps .
-          # cpanm --quiet --notest $(dzil listdeps --author --missing)
-      -
-        name: Install DBD
-        run:  cpanm install DBD::Pg
-      -
-        name: view logs
-        if: always()
-        run: cat /github/home/.cpanm/work/1696836881.1077/build.log
+          apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl zlib1g-dev pkg-config git libpq-dev
+          cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Codecov
+          cpanm --quiet --notest $(dzil authordeps --missing)
+          cpanm -n --installdeps .
+          cpanm --quiet --notest $(dzil listdeps --author --missing)
