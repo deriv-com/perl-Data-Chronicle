@@ -34,3 +34,7 @@ jobs:
       -
         name: Install DBD
         run:  cpanm install DBD::Pg
+      -
+        name: view logs
+        if: always()
+        run: cat /github/home/.cpanm/work/1696836881.1077/build.log
