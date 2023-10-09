@@ -24,7 +24,7 @@ jobs:
     steps:
       -
         name: Prepare Environment
-        run: apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl zlib1g-dev pkg-config git libpq-dev
+        run: apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl zlib1g-dev pkg-config git libpq-dev apt-transport-https ca-certificates
       -
         name: Checkout Code
         uses: actions/checkout@v4
