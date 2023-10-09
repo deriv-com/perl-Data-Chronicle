@@ -55,7 +55,7 @@ jobs:
         run: dzil xtest
   release:
     # if: github.ref == 'refs/heads/master'
-    needs: test
+    # needs: test
     runs-on: ubuntu-latest
     container:
       image: debian:bullseye
@@ -72,7 +72,7 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       -
         name: Checkout Code
-        run: actions/checkout@v4
+        uses: actions/checkout@v4
       - 
         name: Install Perl Dependencies
         run: |
