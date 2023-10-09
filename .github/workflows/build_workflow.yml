@@ -40,7 +40,7 @@ jobs:
       -
         name: Install Perl Dependencies
         run: |
-          cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Codecov
+          cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Coveralls
           cpanm --quiet --notest $(dzil authordeps --missing)
           cpanm -n --installdeps .
           cpanm --quiet --notest $(dzil listdeps --author --missing)
@@ -49,7 +49,56 @@ jobs:
         run: dzil smoke --release --author
       -
         name: Run Coverage Test
-        run: dzil cover -test -report codecov
+        run: dzil cover -test -report coveralls
       -
         name: Run extended author test
         run: dzil xtest
+  release:
+    if: github.ref == 'refs/heads/master'
+    needs: test
+    runs-on: ubuntu-latest
+    container:
+      image: debian:bullseye
+    env:
+      PAUSE_USER: ${{ secrets.PAUSE_USER }}
+      PAUSE_PASSWORD: ${{ secrets.PAUSE_PASSWORD }}
+    steps:
+      -
+        name: Install Essential Packages
+        run: | 
+          apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl \
+          zlib1g-dev pkg-config git libpq-dev apt-transport-https ca-certificates \
+          apt-utils wget curl gnupg2 lsb-release
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      -
+        name: Checkout Code
+        run: actions/checkout@v4
+      - 
+        name: Install Perl Dependencies
+        run: |
+          cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Coveralls
+          cpanm --quiet --notest $(dzil authordeps --missing)
+          cpanm -n --installdeps .
+          cpanm --quiet --notest $(dzil listdeps --author --missing) 
+      - 
+        name: setup PAUSE account
+        run: echo -e "user $PAUSE_USER\npassword $PAUSE_PASSWORD\n" >> ~/.pause
+      - 
+        name: setup git
+        run: |
+          git config --global user.email "circleci@binary.com"
+          git config --global user.name "circleci"
+          # set remote github because dzil will push to github
+          # https://metacpan.org/release/DERIV/Dist-Zilla-PluginBundle-Author-DERIV-0.003/source/lib/Dist/Zilla/PluginBundle/Author/DERIV.pm#L122
+          git remote add github $(git remote get-url origin)
+      - 
+        name: Release to PAUSE
+        run: |
+          if grep -Pzq '\{\{\$NEXT\}\}\n\s*\n' Changes
+          then
+              echo "No changes, no need release"
+              exit 0
+          fi
+          # use git push to test permission
+          git push github master
+          echo "y\n" | DZIL_CONFIRMRELEASE_DEFAULT=y dzil release
