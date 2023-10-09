@@ -16,11 +16,9 @@ jobs:
       TEST_REDIS: redis://redis:6379
     container:
       image: debian:bullseye
-    # services:
-    #   redis:
-    #     image: redis
-    #   postgres:
-    #     image: postgres
+    services:
+      redis:
+        image: redis
     steps:
       -
         name: Prepare Environment
