@@ -12,6 +12,8 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      TEST_REDIS: redis://redis:6379
     container:
       image: debian:bullseye
     services:
@@ -31,3 +33,12 @@ jobs:
           cpanm --quiet --notest $(dzil authordeps --missing)
           cpanm -n --installdeps .
           cpanm --quiet --notest $(dzil listdeps --author --missing)
+      -
+        name: Run Smoke Test
+        run: dzil smoke --release --author
+      -
+        name: Run Coverage Test
+        run: dzil cover -test -report codecov
+      -
+        name: Run extended author test
+        run: dzil xtest
