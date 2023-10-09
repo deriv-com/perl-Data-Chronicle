@@ -54,14 +54,14 @@ jobs:
         name: Run extended author test
         run: dzil xtest
   release:
-    # if: github.ref == 'refs/heads/master'
-    # needs: test
+    if: github.ref == 'refs/heads/master'
+    needs: test
     runs-on: ubuntu-latest
     container:
       image: debian:bullseye
     env:
-      PAUSE_USER: test
-      PAUSE_PASSWORD: test
+      PAUSE_USER: ${{ secrets.PAUSE_USER }}
+      PAUSE_PASSWORD: ${{ secrets.PAUSE_PASSWORD }}
     steps:
       -
         name: Install Essential Packages
@@ -100,5 +100,5 @@ jobs:
               exit 0
           fi
           # use git push to test permission
-          # git push github master
+          git push github master
           echo "y\n" | DZIL_CONFIRMRELEASE_DEFAULT=y dzil release
