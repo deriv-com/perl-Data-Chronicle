@@ -26,7 +26,7 @@ jobs:
       -
         name: Prepare Environment
         run: |
-          apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl zlib1g-dev pkg-config
+          apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl zlib1g-dev pkg-config git
           cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Codecov
           cpanm --quiet --notest $(dzil authordeps --missing)
           cpanm -n --installdeps .
