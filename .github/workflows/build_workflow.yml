@@ -23,12 +23,14 @@ jobs:
         image: postgres
     steps:
       -
+        name: Prepare Environment
+        run: apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl zlib1g-dev pkg-config git libpq-dev
+      -
         name: Checkout Code
         uses: actions/checkout@v4
       -
-        name: Prepare Environment
+        name: Install Perl Dependencies
         run: |
-          apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl zlib1g-dev pkg-config git libpq-dev
           # cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Codecov
           # cpanm --quiet --notest $(dzil authordeps --missing)
           # cpanm -n --installdeps .
