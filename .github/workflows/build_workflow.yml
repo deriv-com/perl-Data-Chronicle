@@ -1,18 +1,33 @@
 name: Build workflow
 run-name: Build workflow
-on: [push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  Explore-GitHub-Actions:
+  test:
     runs-on: ubuntu-latest
+    container:
+      image: debian:bullseye
+    services:
+      redis:
+        image: redis
+      postgres:
+        image: postgres
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+      -
+        name: Checkout Code
+        uses: actions/checkout@v4
+      -
+        name: Prepare Environment
         run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+          apt-get update && apt-get install -y --no-install-recommends libssl-dev zlib1g-dev pkg-config
+          cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Codecov
+          cpanm --quiet --notest $(dzil authordeps --missing)
+          cpanm -n --installdeps .
+          cpanm --quiet --notest $(dzil listdeps --author --missing)
