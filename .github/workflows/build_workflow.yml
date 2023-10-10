@@ -59,9 +59,13 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: debian:bullseye
+    services:
+      redis:
+        image: redis
     env:
       PAUSE_USER: ${{ secrets.PAUSE_USER }}
       PAUSE_PASSWORD: ${{ secrets.PAUSE_PASSWORD }}
+      TEST_REDIS: redis://redis:6379
     steps:
       -
         name: Install Essential Packages
@@ -70,6 +74,13 @@ jobs:
           zlib1g-dev pkg-config git libpq-dev apt-transport-https ca-certificates \
           apt-utils wget curl gnupg2 lsb-release
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      -
+        name: Install Postgres
+        run: |
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+          echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+          apt-get update
+          apt-get install -y postgresql-14 
       -
         name: Checkout Code
         uses: actions/checkout@v4
