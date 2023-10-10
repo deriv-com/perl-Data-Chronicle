@@ -54,7 +54,7 @@ jobs:
         name: Run extended author test
         run: dzil xtest
   release:
-    if: github.ref == 'refs/heads/master'
+    # if: github.ref == 'refs/heads/master'
     needs: test
     runs-on: ubuntu-latest
     container:
@@ -63,8 +63,8 @@ jobs:
       redis:
         image: redis
     env:
-      PAUSE_USER: ${{ secrets.PAUSE_USER }}
-      PAUSE_PASSWORD: ${{ secrets.PAUSE_PASSWORD }}
+      PAUSE_USER: test
+      PAUSE_PASSWORD: test
       TEST_REDIS: redis://redis:6379
     steps:
       -
@@ -105,11 +105,11 @@ jobs:
       - 
         name: Release to PAUSE
         run: |
-          if grep -Pzq '\{\{\$NEXT\}\}\n\s*\n' Changes
-          then
-              echo "No changes, no need release"
-              exit 0
-          fi
+          # if grep -Pzq '\{\{\$NEXT\}\}\n\s*\n' Changes
+          # then
+          #     echo "No changes, no need release"
+          #     exit 0
+          # fi
           # use git push to test permission
-          git push github master
+          #git push github master
           echo "y\n" | DZIL_CONFIRMRELEASE_DEFAULT=y dzil release
