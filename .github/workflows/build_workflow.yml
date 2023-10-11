@@ -1,18 +1,116 @@
 name: Build workflow
 run-name: Build workflow
-on: [push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  Explore-GitHub-Actions:
+  test:
     runs-on: ubuntu-latest
+    env:
+      TEST_REDIS: redis://redis:6379
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    container:
+      image: debian:bullseye
+    services:
+      redis:
+        image: redis
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+      -
+        name: Install Essential Packages
+        run: | 
+          apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl \
+          zlib1g-dev pkg-config git libpq-dev apt-transport-https ca-certificates \
+          apt-utils wget curl gnupg2 lsb-release
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      -
+        name: Install Postgres
         run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+          echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+          apt-get update
+          apt-get install -y postgresql-14 
+      -
+        name: Checkout Code
+        uses: actions/checkout@v4
+      -
+        name: Install Perl Dependencies
+        run: |
+          cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Coveralls
+          cpanm --quiet --notest $(dzil authordeps --missing)
+          cpanm -n --installdeps .
+          cpanm --quiet --notest $(dzil listdeps --author --missing)
+      -
+        name: Run Smoke Test
+        run: dzil smoke --release --author
+      -
+        name: Run Coverage Test
+        run: dzil cover -test -report coveralls
+      -
+        name: Run extended author test
+        run: dzil xtest
+  release:
+    if: github.ref == 'refs/heads/master'
+    needs: test
+    runs-on: ubuntu-latest
+    container:
+      image: debian:bullseye
+    services:
+      redis:
+        image: redis
+    env:
+      PAUSE_USER: ${{ secrets.PAUSE_USER }}
+      PAUSE_PASSWORD: ${{ secrets.PAUSE_PASSWORD }}
+      TEST_REDIS: redis://redis:6379
+    steps:
+      -
+        name: Install Essential Packages
+        run: | 
+          apt-get update && apt-get install -y --no-install-recommends libssl-dev cpanminus make gcc openssl \
+          zlib1g-dev pkg-config git libpq-dev apt-transport-https ca-certificates \
+          apt-utils wget curl gnupg2 lsb-release
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      -
+        name: Install Postgres
+        run: |
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+          echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+          apt-get update
+          apt-get install -y postgresql-14 
+      -
+        name: Checkout Code
+        uses: actions/checkout@v4
+      - 
+        name: Install Perl Dependencies
+        run: |
+          cpanm --quiet --notest Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Coveralls
+          cpanm --quiet --notest $(dzil authordeps --missing)
+          cpanm -n --installdeps .
+          cpanm --quiet --notest $(dzil listdeps --author --missing) 
+      - 
+        name: setup PAUSE account
+        run: echo -e "user $PAUSE_USER\npassword $PAUSE_PASSWORD\n" >> ~/.pause
+      - 
+        name: setup git
+        run: |
+          git config --global user.email "circleci@binary.com"
+          git config --global user.name "circleci"
+          # set remote github because dzil will push to github
+          # https://metacpan.org/release/DERIV/Dist-Zilla-PluginBundle-Author-DERIV-0.003/source/lib/Dist/Zilla/PluginBundle/Author/DERIV.pm#L122
+          git remote add github $(git remote get-url origin)
+      - 
+        name: Release to PAUSE
+        run: |
+          if grep -Pzq '\{\{\$NEXT\}\}\n\s*\n' Changes
+          then
+              echo "No changes, no need release"
+              exit 0
+          fi
+          # use git push to test permission
+          git push github master
+          echo "y\n" | DZIL_CONFIRMRELEASE_DEFAULT=y dzil release
